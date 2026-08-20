@@ -1,0 +1,3012 @@
+<title>Gridiron Gauntlet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap">
+
+<style>
+/* ============================================================
+   Gridiron Gauntlet — committed single-theme design.
+   This is an arena/broadcast UI, not a document: it holds one
+   visual world (night game, stadium light, chalk on turf) in
+   both host themes. Every color is painted explicitly.
+   ============================================================ */
+:root{
+  --ground:#0B100E;
+  --panel:#121A16;
+  --panel-2:#18221D;
+  --panel-3:#1E2A24;
+  --line:#25332C;
+  --line-soft:#1B241F;
+
+  --chalk:#EAF2EC;
+  --chalk-dim:#8B9C92;
+  --chalk-faint:#5A6B62;
+
+  --yellow:#FFD23F;
+  --yellow-ink:#1A1400;
+  --red:#E1503C;
+  --mint:#17E0A0;
+
+  --r-sm:3px;
+  --r-md:5px;
+
+  --f-display:'Anton', 'Arial Narrow', Impact, sans-serif;
+  --f-cond:'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  --f-body:'Barlow', 'Helvetica Neue', Arial, sans-serif;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--chalk);
+  font-family:var(--f-body);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
+button:focus-visible, textarea:focus-visible, input:focus-visible{
+  outline:2px solid var(--yellow);
+  outline-offset:2px;
+}
+
+/* ---------- shell ---------- */
+.app{min-height:100vh;display:flex;flex-direction:column;}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:12px 20px;
+  border-bottom:1px solid var(--line);
+  background:var(--panel);
+  flex-wrap:wrap;
+}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto;}
+.brand h1{
+  font-family:var(--f-display);
+  font-size:23px;
+  letter-spacing:.035em;
+  margin:0;
+  text-transform:uppercase;
+  color:var(--chalk);
+}
+.brand .sub{
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+}
+
+.chip{
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+  border:1px solid var(--line);
+  background:var(--panel-2);
+  padding:5px 10px;
+  border-radius:var(--r-sm);
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+.chip b{color:var(--chalk);font-weight:600;font-variant-numeric:tabular-nums;}
+
+.tog{
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+  border:1px solid var(--line);
+  background:var(--panel-2);
+  padding:5px 11px;
+  border-radius:var(--r-sm);
+  transition:color .15s, border-color .15s, background .15s;
+}
+.tog:hover{color:var(--chalk);border-color:var(--chalk-faint);}
+.tog[aria-pressed="true"]{color:var(--yellow);border-color:#5A4A15;background:#1E1B0C;}
+
+/* ---------- main split ---------- */
+.main{
+  flex:1;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 296px;
+  align-items:stretch;
+}
+.stage{
+  position:relative;
+  padding:16px;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* ---------- commentary booth ---------- */
+.booth{
+  flex:none;
+  height:112px;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  background:var(--panel);
+  padding:9px 14px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-height:0;
+}
+.booth-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--f-cond);
+  font-size:12px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+  flex:none;
+}
+.booth-head .on-air{
+  color:var(--red);
+  border:1px solid #4A211B;
+  background:#1C100E;
+  padding:1px 6px;
+  border-radius:2px;
+  letter-spacing:.16em;
+}
+.booth-feed{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.bline{
+  font-family:var(--f-cond);
+  font-size:15px;
+  line-height:1.35;
+  color:var(--chalk-faint);
+  transition:color .3s;
+}
+.bline:last-child{color:var(--chalk);}
+.bline b{
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  font-size:12px;
+  margin-right:7px;
+}
+.bline b.pbp{color:var(--yellow);}
+.bline b.col{color:var(--mint);}
+.frame{
+  position:relative;
+  flex:1;
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  overflow:hidden;
+  background:#0D1511;
+  box-shadow:0 18px 50px -30px #000;
+}
+canvas{display:block;width:100%;height:100%;}
+
+/* ---------- live readout (broadcast corner) ---------- */
+.readout{
+  position:absolute;
+  top:0; right:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+  padding:12px 14px;
+  z-index:3;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .25s;
+}
+.readout.on{opacity:1;}
+.readout .big{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  font-family:var(--f-cond);
+  font-weight:700;
+  color:var(--chalk);
+  text-shadow:0 2px 14px #000;
+  font-variant-numeric:tabular-nums;
+}
+.readout .big span{font-size:46px;line-height:.9;letter-spacing:-.01em;}
+.readout .big i{
+  font-style:normal;
+  font-size:14px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+}
+.readout .big.ahead span{color:var(--yellow);}
+.readout .beat-chip{
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+  background:#0B100Ecc;
+  border:1px solid var(--line);
+  padding:3px 8px;
+  border-radius:var(--r-sm);
+  font-variant-numeric:tabular-nums;
+}
+.readout .beat-chip b{color:var(--yellow);font-weight:600;}
+
+/* ---------- between-run beat card ---------- */
+.beat{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  z-index:4;
+  pointer-events:none;
+  padding:20px;
+  background:radial-gradient(ellipse at center, #080C0Ae8 0%, #080C0A99 45%, #080C0A00 78%);
+}
+.beat[hidden]{display:none;}
+.beat-inner{animation:beatIn .38s cubic-bezier(.2,.8,.3,1) both;}
+@keyframes beatIn{from{opacity:0;transform:translateY(10px) scale(.985);}to{opacity:1;transform:none;}}
+.beat-kicker{
+  font-family:var(--f-cond);
+  font-size:14px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+}
+.beat-name{
+  font-family:var(--f-display);
+  font-size:clamp(34px,6.6vw,72px);
+  line-height:1;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  margin:8px 0 11px;
+  color:var(--chalk);
+  text-shadow:0 6px 34px #000;
+  text-wrap:balance;
+}
+.beat-name.scored{color:var(--mint);}
+.beat-sub{
+  font-family:var(--f-cond);
+  font-size:16px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+}
+.beat-sub b{color:var(--chalk);font-weight:600;}
+.beat-sub.best{color:var(--yellow);}
+.beat-sub.best b{color:var(--yellow);}
+
+/* ---------- lower third ---------- */
+.bug{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  display:flex;
+  align-items:stretch;
+  background:linear-gradient(180deg, #0B100Ecc, #0B100Ef2);
+  border-top:1px solid var(--line);
+  font-family:var(--f-cond);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  z-index:5;
+  opacity:0;
+  transform:translateY(100%);
+  transition:opacity .3s, transform .3s;
+}
+.bug.on{opacity:1;transform:none;}
+.bug > *{padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:14px;}
+.bug .live{background:var(--red);color:#fff;font-weight:600;letter-spacing:.15em;}
+.bug .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.bug .runof{
+  color:var(--chalk);
+  font-variant-numeric:tabular-nums;
+  border-right:1px solid var(--line);
+  font-weight:600;
+}
+.bug .evt{color:var(--chalk-dim);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bug .evt b{color:var(--chalk);font-weight:600;}
+.bug .evt .hl{color:var(--yellow);font-weight:600;}
+.bug .evt .sc{color:var(--mint);font-weight:600;}
+
+/* ---------- rail ---------- */
+.rail{
+  border-left:1px solid var(--line);
+  background:var(--panel);
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+.rail-head{
+  padding:13px 16px 11px;
+  border-bottom:1px solid var(--line);
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.rail-body{overflow-y:auto;flex:1;}
+
+.subhead{
+  padding:12px 16px 7px;
+  font-family:var(--f-cond);
+  font-size:12px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+  border-top:1px solid var(--line);
+  background:#0F1613;
+}
+.row{
+  display:grid;
+  grid-template-columns:26px 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:8px 16px;
+  border-bottom:1px solid var(--line-soft);
+  font-family:var(--f-cond);
+}
+.row .pos{font-size:14px;color:var(--chalk-faint);font-variant-numeric:tabular-nums;text-align:right;}
+.row .who{display:flex;align-items:center;gap:9px;min-width:0;}
+.row .jer{
+  width:20px;height:20px;
+  border-radius:3px;
+  display:grid;place-items:center;
+  font-size:11px;font-weight:700;color:#0B100E;
+  flex:none;font-variant-numeric:tabular-nums;
+}
+.row .nm{
+  font-size:16px;font-weight:500;color:var(--chalk);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.row .yds{
+  font-size:18px;font-weight:600;
+  font-variant-numeric:tabular-nums;
+  color:var(--chalk);
+}
+.row .yds i{font-size:11px;font-style:normal;color:var(--chalk-faint);margin-left:3px;letter-spacing:.1em;}
+.row.lead{background:#191509;}
+.row.lead .yds{color:var(--yellow);}
+.row.lead .nm{color:var(--yellow);}
+.row.scored .yds{color:var(--mint);}
+.row.onclock{background:#161E1A;}
+.row.onclock .nm{color:var(--chalk);}
+.row.onclock .yds{color:var(--red);font-size:13px;letter-spacing:.12em;}
+.row.queued .nm{color:var(--chalk-dim);}
+.row.queued .jer{opacity:.42;}
+.row.queued .yds{color:var(--chalk-faint);font-size:13px;letter-spacing:.1em;}
+
+.note{
+  padding:14px 16px 18px;
+  border-top:1px solid var(--line);
+  font-size:13px;
+  line-height:1.6;
+  color:var(--chalk-faint);
+}
+.note b{color:var(--chalk-dim);font-weight:600;}
+
+/* ---------- overlays ---------- */
+.ov{
+  position:absolute;
+  inset:0;
+  display:grid;
+  background:linear-gradient(180deg,#080C0Aee,#080C0Af7);
+  overflow-y:auto;
+  z-index:6;
+}
+.ov[hidden]{display:none;}
+
+.pre{place-items:center;padding:28px;}
+.pre-card{width:100%;max-width:560px;display:flex;flex-direction:column;gap:20px;}
+.pre-head h2{
+  font-family:var(--f-display);
+  font-size:clamp(30px,4.4vw,46px);
+  line-height:1.02;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  margin:0 0 8px;
+  text-wrap:balance;
+}
+.pre-head h2 em{font-style:normal;color:var(--yellow);}
+.pre-head p{margin:0;color:var(--chalk-dim);font-size:15px;max-width:62ch;}
+.field-l{
+  display:block;
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+  margin-bottom:7px;
+}
+textarea, input[type=text]{
+  width:100%;
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  color:var(--chalk);
+  padding:10px 12px;
+  font-family:var(--f-body);
+  font-size:15px;
+  line-height:1.55;
+  resize:vertical;
+}
+textarea{min-height:150px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.segs{display:flex;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;}
+.segs button{
+  flex:1;
+  padding:9px 6px;
+  font-family:var(--f-cond);
+  font-size:14px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+  background:var(--panel-2);
+  border-right:1px solid var(--line);
+  transition:color .15s, background .15s;
+}
+.segs button:last-child{border-right:none;}
+.segs button:hover{color:var(--chalk);}
+.segs button[aria-pressed="true"]{background:var(--panel-3);color:var(--chalk);}
+/* ---------- saved-game lookup ---------- */
+.code-row{display:flex;gap:10px;align-items:center;}
+.code-row input{
+  flex:1;
+  min-width:0;
+  width:auto;
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.04em;
+  color:var(--chalk-dim);
+}
+.code-row .btn{flex:none;padding:10px 14px;}
+
+.hint{
+  margin:8px 0 0;
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.04em;
+  color:var(--chalk-faint);
+  line-height:1.4;
+}
+
+.go{
+  width:100%;
+  background:var(--yellow);
+  color:var(--yellow-ink);
+  font-family:var(--f-display);
+  font-size:22px;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  padding:15px;
+  border-radius:var(--r-sm);
+  transition:filter .15s, transform .05s;
+}
+.go:hover{filter:brightness(1.08);}
+.go:active{transform:translateY(1px);}
+
+.err{
+  color:var(--red);
+  font-family:var(--f-cond);
+  font-size:14px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  min-height:20px;
+}
+.rules{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 20px;
+  font-family:var(--f-cond);
+  font-size:14px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+  border-top:1px solid var(--line);
+  padding-top:16px;
+}
+.rules span b{color:var(--chalk-dim);font-weight:600;}
+
+/* results */
+.res{place-items:start center;padding:26px;}
+.res-card{width:100%;max-width:600px;display:flex;flex-direction:column;gap:16px;}
+.res-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.res-head h2{
+  font-family:var(--f-display);
+  font-size:34px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  margin:0;
+}
+.board{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--panel);}
+.brow{
+  display:grid;
+  grid-template-columns:56px 26px 1fr auto;
+  align-items:center;
+  gap:12px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--line-soft);
+  font-family:var(--f-cond);
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.brow.show{opacity:1;transform:none;}
+.brow:last-child{border-bottom:none;}
+.brow .pick{
+  font-size:15px;font-weight:600;color:var(--chalk-faint);
+  font-variant-numeric:tabular-nums;letter-spacing:.06em;
+}
+.brow .jer{
+  width:22px;height:22px;border-radius:3px;
+  display:grid;place-items:center;
+  font-size:11px;font-weight:700;color:#0B100E;
+  font-variant-numeric:tabular-nums;
+}
+.brow .nm{font-size:19px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.brow .res-y{font-size:15px;color:var(--chalk-dim);font-variant-numeric:tabular-nums;letter-spacing:.04em;}
+.brow.first{background:#191509;}
+.brow.first .pick{color:var(--yellow);}
+.brow.first .nm{color:var(--yellow);font-weight:600;}
+.brow.scored .res-y{color:var(--mint);}
+
+.res-acts{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--f-cond);
+  font-size:15px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  padding:10px 18px;
+  border:1px solid var(--line);
+  background:var(--panel-2);
+  border-radius:var(--r-sm);
+  color:var(--chalk-dim);
+  transition:color .15s, border-color .15s;
+}
+.btn:hover{color:var(--chalk);border-color:var(--chalk-faint);}
+.btn.pri{background:var(--yellow);color:var(--yellow-ink);border-color:var(--yellow);font-weight:600;}
+.btn.pri:hover{filter:brightness(1.08);color:var(--yellow-ink);}
+
+.copyout{
+  width:100%;
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:12px 14px;
+  font-family:var(--f-cond);
+  font-size:14px;
+  line-height:1.65;
+  color:var(--chalk-dim);
+  white-space:pre;
+  overflow-x:auto;
+  margin:0;
+  font-variant-numeric:tabular-nums;
+}
+.seedline{
+  font-family:var(--f-cond);
+  font-size:13px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--chalk-faint);
+}
+.seedline b{color:var(--chalk-dim);font-weight:600;}
+
+/* On desktop the shell owns the viewport and the canvas gives up height
+   to the booth. Without the min-height:0 chain, flex children refuse to
+   shrink below their content and the booth falls off the bottom. */
+@media (min-width:901px){
+  .app{height:100vh;}
+  .main{min-height:0;}
+  .stage{min-height:0;}
+  .frame{min-height:0;}
+  .rail{min-height:0;}
+}
+@media (min-width:901px) and (max-height:620px){
+  .booth{height:84px;}
+}
+
+@media (max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .rail{border-left:none;border-top:1px solid var(--line);max-height:340px;}
+  .booth{height:92px;}
+  .grid2{grid-template-columns:1fr;}
+  .stage{padding:12px;}
+  .readout .big span{font-size:34px;}
+}
+
+/* Short viewports: keep Kick off reachable without hunting for it. */
+@media (max-height:760px){
+  .pre{padding:18px;}
+  .pre-card{gap:13px;}
+  .pre-head h2{font-size:clamp(22px,3.2vw,30px);}
+  .pre-head p{font-size:13.5px;line-height:1.45;}
+  textarea{min-height:96px;}
+  .go{font-size:19px;padding:12px;}
+  .rules{padding-top:11px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>Gridiron Gauntlet</h1>
+      <span class="sub">Draft order sim</span>
+    </div>
+    <span class="chip" id="seedChip">Seed <b>—</b></span>
+    <button class="tog" id="speedBtn" aria-pressed="false">Speed 1&times;</button>
+    <button class="tog" id="soundBtn" aria-pressed="false">Sound Off</button>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <div class="frame" id="frame">
+        <canvas id="cv"></canvas>
+
+        <div class="readout" id="readout">
+          <div class="big" id="bigYds"><span>0</span><i>yds</i></div>
+          <div class="beat-chip" id="beatChip" hidden></div>
+        </div>
+
+        <div class="beat" id="beat" hidden>
+          <div class="beat-inner">
+            <div class="beat-kicker" id="beatKicker">Run 1 of 12</div>
+            <div class="beat-name" id="beatName">Marcus</div>
+            <div class="beat-sub" id="beatSub">First run &mdash; no line to beat</div>
+          </div>
+        </div>
+
+        <div class="bug" id="bug">
+          <div class="live"><span class="dot"></span>Live</div>
+          <div class="runof" id="runof">Run 1 / 12</div>
+          <div class="evt" id="evt">Runner set at the goal line.</div>
+        </div>
+
+        <!-- PREGAME -->
+        <div class="ov pre" id="pregame">
+          <div class="pre-card">
+            <div class="pre-head">
+              <h2>One runner at a time. <em>Furthest picks first.</em></h2>
+              <p>Each manager takes the handoff alone on their own 1-yard line and runs the same gauntlet — same number of defenders, same coverage thickening downfield, fresh positions every time. Wherever you get dragged down becomes the line to beat, and everyone after you is running at it.</p>
+            </div>
+
+            <div>
+              <label class="field-l" for="names">Managers — one per line</label>
+              <textarea id="names" spellcheck="false"></textarea>
+            </div>
+
+            <div class="grid2">
+              <div>
+                <span class="field-l">Gauntlet</span>
+                <div class="segs" id="diff" role="group" aria-label="Gauntlet difficulty">
+                  <button type="button" data-d="0.7" aria-pressed="false">Loose</button>
+                  <button type="button" data-d="1" aria-pressed="true">Standard</button>
+                  <button type="button" data-d="1.8" aria-pressed="false">Brutal</button>
+                </div>
+                <p class="hint" id="diffHint">Balanced. The order usually settles between the 30 and the 55.</p>
+              </div>
+              <div>
+
+                <label class="field-l" for="seed">Seed</label>
+                <input type="text" id="seed" spellcheck="false">
+              </div>
+            </div>
+
+            <div class="err" id="err"></div>
+            <button class="go" id="kick">Kick off</button>
+
+            <div class="rules">
+              <span><b>Identical stats</b> — every runner</span>
+              <span><b>Same seed</b> — same result</span>
+              <span><b>Order &amp; lanes</b> — drawn by seed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="ov res" id="results" hidden>
+          <div class="res-card">
+            <div class="res-head">
+              <h2>Draft order</h2>
+              <span class="seedline">Seed <b id="resSeed">—</b></span>
+            </div>
+            <div class="board" id="board"></div>
+            <div class="res-acts">
+              <button class="btn pri" id="copyBtn">Copy order</button>
+              <button class="btn" id="againBtn">Run it back</button>
+              <button class="btn" id="replayBtn">Replay this seed</button>
+              <button class="btn" id="editBtn">Edit managers</button>
+            </div>
+            <pre class="copyout" id="copyout"></pre>
+
+            <div>
+              <label class="field-l" for="shareUrl">Share link — opens straight into this exact draft</label>
+              <div class="code-row">
+                <input type="text" id="shareUrl" readonly spellcheck="false">
+                <button type="button" class="btn" id="copyLinkBtn">Copy link</button>
+              </div>
+              <p class="hint" id="shareHint"></p>
+            </div>
+
+            <div>
+              <label class="field-l" for="hookUrl">Discord webhook &mdash; posts the board and the link to your channel</label>
+              <div class="code-row">
+                <input type="text" id="hookUrl" spellcheck="false" placeholder="https://discord.com/api/webhooks/…">
+                <button type="button" class="btn" id="postBtn">Post</button>
+              </div>
+              <p class="hint" id="hookHint"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="booth">
+        <div class="booth-head">
+          <span class="on-air">On air</span>
+          <span>Vance &amp; Dockery &mdash; the booth</span>
+        </div>
+        <div class="booth-feed" id="boothFeed"></div>
+      </div>
+    </div>
+
+    <aside class="rail">
+      <div class="rail-head"><span id="railTitle">Standings</span><span id="railSub"></span></div>
+      <div class="rail-body" id="railBody"></div>
+      <div class="note" id="railNote">
+        <b>How it&rsquo;s fair.</b> Every runner has the same top speed, the same cut ability and the same odds of breaking a tackle, and every run faces the same number of defenders on the same depth curve. Running order and starting lane are both drawn by the seed. Running later tells you what to beat, but it does not help you beat it &mdash; nobody runs differently for knowing the number.
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==========================================================
+   Constants — world units are YARDS. x: -10..110, y: 0..53.33
+   ========================================================== */
+const FW = 53.33;
+const GOAL_A = 0, GOAL_B = 100;
+const EZ = 10;
+const START_X = 1;
+const LANE_LO = 7, LANE_HI = FW - 7;   // starting lane, drawn per run
+
+const DEF_COUNT = 26;        // defenders per run, before difficulty
+const DEF_X0    = 9;         // shallowest a defender sets up
+const DEF_SPAN  = 84;        // ...to the far end of the gauntlet
+
+const RUN_SPD  = 9.3;
+const DEF_SPD  = 7.5;
+const ENGAGE_R = 11;         // how far out a defender breaks on the runner
+const GIVE_UP  = 3;          // yards past him before he stops chasing
+const TACKLE_R = 0.95;
+const GRIP_RATE   = 1.7;    // how fast a wrap turns into a tackle
+const ESCAPE_RATE = 0.85;    // how fast you fight back out of one
+const WRAP_DRAG   = 0.34;   // fraction of speed kept while being dragged
+const TIME_CAP = 40;         // per-run sim seconds
+const DT       = 1/120;
+
+const INTRO_T  = 1.5;        // "on the clock" beat before a run
+const RESULT_T = 2.0;        // result beat after a run
+
+const JERSEY = ['#FF4D3D','#FF8A1F','#FFFFFF','#4CC9F0','#3A7BFF','#A06BFF',
+                '#FF6FB5','#17E0A0','#B9C4CC','#FF2E93','#7FE04C','#0FC2C0',
+                '#FF7A5C','#8FD3FF','#D6A5FF','#5CE0C0'];
+
+const DEFAULT_NAMES = ['Marcus','Dana','Ty','Priya','Kev','Rosie','Big Nick',
+                       'Sam','Jules','Ant','Bex','Ollie'];
+
+/* ==========================================================
+   Seeded RNG — the whole sim draws from this one stream, so
+   seed + names + difficulty always reproduce the same night.
+   ========================================================== */
+function hashSeed(str){
+  let h = 1779033703 ^ str.length;
+  for(let i=0;i<str.length;i++){
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function newSeed(){
+  const w = ['BLITZ','WHEEL','GUNNER','SWEEP','FLEA','BOOTLEG','SCREEN','DRAW',
+             'POST','SLANT','WILDCAT','COUNTER','TRAP','ZONE','SNEAK','HAIL'];
+  return w[Math.floor(Math.random()*w.length)] + '-' + String(Math.floor(Math.random()*900)+100);
+}
+
+/* ==========================================================
+   Build
+   ========================================================== */
+function buildSim(names, seedStr, diff){
+  const rng = mulberry32(hashSeed(seedStr + '|' + names.join(',') + '|' + diff));
+  const N = names.length;
+
+  const nums = [];
+  const used = {};
+  for(let i=0;i<N;i++){
+    let n;
+    do { n = 1 + Math.floor(rng()*98); } while(used[n]);
+    used[n] = 1;
+    nums.push(n);
+  }
+
+  const runners = names.map(function(name, i){
+    return {
+      i:i, name:name, color:JERSEY[i % JERSEY.length], num:nums[i],
+      x:START_X, y:FW/2, ang:0, spdF:1, breaks:0, wrap:null, stumble:0,
+      done:false, td:false, finalX:START_X, finalT:0,
+      nextDecide:0, trail:[], hitFlash:0
+    };
+  });
+
+  // Running order drawn from the seed — typing order buys nothing.
+  const order = [];
+  for(let i=0;i<N;i++) order.push(i);
+  for(let i=N-1;i>0;i--){
+    const j = Math.floor(rng()*(i+1));
+    const t = order[i]; order[i]=order[j]; order[j]=t;
+  }
+
+  const S = {
+    rng:rng, seed:seedStr, diff:diff,
+    runners:runners, order:order, idx:0,
+    runner:null, defenders:[], marks:[], events:[], flashes:[],
+    t:0, phase:'intro', phaseT:0, shake:0,
+    bestX:START_X, bestName:null, passedBeat:false,
+    lastResult:null
+  };
+
+  prepareRun(S);
+  return S;
+}
+
+/* Every run faces the same number of defenders spread by the same
+   depth curve — coverage thickens the deeper you go — but their exact
+   spots are redrawn each time. Scattering on a gradient rather than in
+   ranked waves matters: discrete waves create a line where everyone
+   reliably dies, which squashes the whole league into a few yards of
+   each other. A gradient gives a smooth survival curve instead, so the
+   finishing yardages spread out and the draft order is unambiguous. */
+function buildDefense(S){
+  const rng = S.rng;
+  const defenders = [];
+  const K = Math.max(3, Math.round(DEF_COUNT * S.diff));
+  for(let k=0;k<K;k++){
+    // sqrt bias puts more bodies downfield: density rises with depth
+    const homeX = DEF_X0 + DEF_SPAN * Math.sqrt(rng());
+    const homeY = 2.5 + rng()*(FW-5);
+    defenders.push({
+      homeX:homeX, homeY:homeY,
+      x:homeX, y:homeY,
+      vx:0, vy:0,
+      spd: DEF_SPD + (rng()-0.5)*0.75,
+      down:false, upAt:0
+    });
+  }
+  S.defenders = defenders;
+}
+
+function prepareRun(S){
+  const r = S.runners[S.order[S.idx]];
+  r.x = START_X;
+  r.y = LANE_LO + S.rng()*(LANE_HI - LANE_LO);
+  r.ang = 0; r.spdF = 1;
+  r.breaks = 0; r.hitFlash = 0; r.wrap = null; r.stumble = 0;
+  r.trail = [[r.x, r.y]];
+  r.nextDecide = S.rng()*0.06;
+  S.runner = r;
+  S.t = 0;
+  S.phase = 'intro';
+  S.phaseT = 0;
+  S.passedBeat = false;
+  S.flashes = [];
+  buildDefense(S);
+}
+
+/* ==========================================================
+   Steering — the runner fans out candidate headings and scores
+   each by forward progress minus predicted danger. This is what
+   produces the cutbacks; it is not a per-runner stat.
+   ========================================================== */
+const RAYS = 13, RAY_SPREAD = 1.38, RAY_SAMPLES = 8, RAY_STEP = 1.7;
+
+function decide(S, r){
+  const near = [];
+  for(let i=0;i<S.defenders.length;i++){
+    const d = S.defenders[i];
+    if(d.down) continue;
+    const dx = d.x - r.x, dy = d.y - r.y;
+    if(dx > -12 && dx < 26 && dy > -22 && dy < 22) near.push(d);
+  }
+
+  let bestScore = -1e9, bestAng = r.ang;
+  for(let k=0;k<RAYS;k++){
+    const ang = (k/(RAYS-1)*2 - 1) * RAY_SPREAD;
+    const ca = Math.cos(ang), sa = Math.sin(ang);
+
+    let score = 3.4 * ca;
+    score -= 0.55 * Math.abs(ang - r.ang);
+
+    for(let s=1;s<=RAY_SAMPLES;s++){
+      const dist = s * RAY_STEP;
+      const px = r.x + ca*dist, py = r.y + sa*dist;
+      const tt = dist / RUN_SPD;
+      const w = 1 / (0.55 + s*0.32);
+
+      if(py < 1.4)    score -= 9 * w * (1.4 - py);
+      if(py > FW-1.4) score -= 9 * w * (py - (FW-1.4));
+
+      for(let i=0;i<near.length;i++){
+        const d = near[i];
+        const ddx = (d.x + d.vx*tt) - px;
+        const ddy = (d.y + d.vy*tt) - py;
+        score -= (10.5 * w) / (0.65 + ddx*ddx + ddy*ddy);
+      }
+    }
+    if(score > bestScore){ bestScore = score; bestAng = ang; }
+  }
+  return bestAng;
+}
+
+/* ==========================================================
+   One step — phase machine plus the running physics
+   ========================================================== */
+function step(S, dt){
+  if(S.phase === 'over') return;
+
+  S.phaseT += dt;
+
+  if(S.phase === 'intro'){
+    if(S.phaseT >= INTRO_T){ S.phase = 'running'; S.phaseT = 0; S.t = 0; }
+    return;
+  }
+  if(S.phase === 'result'){
+    if(S.phaseT >= RESULT_T) advance(S);
+    return;
+  }
+
+  S.t += dt;
+  const rng = S.rng;
+  const r = S.runner;
+
+  /* --- runner --- */
+  if(r.stumble > 0) r.stumble -= dt;
+
+  if(S.t >= r.nextDecide){
+    const maxTurn = r.wrap ? 0.18 : (r.stumble > 0 ? 0.36 : 0.7);
+    const want = decide(S, r);
+    const delta = Math.max(-maxTurn, Math.min(maxTurn, want - r.ang));
+    r.ang += delta;
+    r.spdF = Math.min(r.spdF, 1 - 0.15 * Math.abs(delta)/0.7);
+    r.nextDecide = S.t + 0.075 + rng()*0.05;
+  }
+
+  r.spdF = Math.min(1, r.spdF + dt * 2.2);
+  const spd = RUN_SPD * r.spdF * (r.wrap ? WRAP_DRAG : 1);
+  r.x += Math.cos(r.ang) * spd * dt;
+  r.y += Math.sin(r.ang) * spd * dt;
+
+  if(r.y < 0.55){ r.y = 0.55; r.ang *= 0.4; }
+  if(r.y > FW-0.55){ r.y = FW-0.55; r.ang *= 0.4; }
+  if(r.hitFlash > 0) r.hitFlash -= dt;
+
+  if(!S.passedBeat && S.bestName && r.x > S.bestX){
+    S.passedBeat = true;
+    S.flashes.push({x:r.x, y:r.y, t:0.5, kind:'beat'});
+    pushEvent(S, 'beat', r, Math.round(r.x - START_X));
+  }
+
+  const last = r.trail[r.trail.length-1];
+  if((r.x-last[0])*(r.x-last[0]) + (r.y-last[1])*(r.y-last[1]) > 0.36){
+    r.trail.push([r.x, r.y]);
+  }
+
+  if(r.x >= GOAL_B){ endRun(S, true); return; }
+
+  /* --- defenders --- */
+  for(let i=0;i<S.defenders.length;i++){
+    const d = S.defenders[i];
+    if(d.down){
+      if(S.t >= d.upAt) d.down = false;
+      d.vx = 0; d.vy = 0;
+      continue;
+    }
+    if(r.wrap && r.wrap.by === d) continue;   // he has hold of the runner
+
+    const dx = r.x - d.x, dy = r.y - d.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const blownPast = dx < -GIVE_UP;
+
+    let gx, gy, gain;
+    if(dist < ENGAGE_R && !blownPast){
+      let tt = dist / d.spd;
+      for(let it=0; it<2; it++){
+        const px = r.x + Math.cos(r.ang)*RUN_SPD*r.spdF*tt;
+        const py = r.y + Math.sin(r.ang)*RUN_SPD*r.spdF*tt;
+        tt = Math.sqrt((px-d.x)*(px-d.x) + (py-d.y)*(py-d.y)) / d.spd;
+      }
+      gx = r.x + Math.cos(r.ang)*RUN_SPD*r.spdF*tt;
+      gy = r.y + Math.sin(r.ang)*RUN_SPD*r.spdF*tt;
+      gain = 1;
+    } else {
+      gx = d.homeX;
+      gy = d.homeY + Math.max(-6, Math.min(6, r.y - d.homeY));
+      gain = 0.42;
+    }
+
+    const gdx = gx - d.x, gdy = gy - d.y;
+    const m = Math.sqrt(gdx*gdx + gdy*gdy) || 1;
+    const sp = d.spd * gain;
+    d.vx = (gdx/m) * sp;
+    d.vy = (gdy/m) * sp;
+    if(m < 0.35){ d.vx *= m/0.35; d.vy *= m/0.35; }
+    d.x += d.vx * dt;
+    d.y += d.vy * dt;
+    d.y = Math.max(0.6, Math.min(FW-0.6, d.y));
+  }
+
+  /* --- contact ---
+     Tackling is not a coin flip at a fixed radius. A defender squared up
+     in front of you arrives with all his closing speed behind the hit; one
+     reaching across your body or trailing from behind gets an arm on you
+     and not much else. So contact starts a WRAP rather than ending the
+     run: you drag, you fight, and either you shed him or his friends
+     arrive and finish it. That is where the extra yards come from. */
+  if(r.wrap){
+    const d = r.wrap.by;
+
+    let mates = 0;
+    for(let k=0;k<S.defenders.length;k++){
+      const o = S.defenders[k];
+      if(o === d || o.down) continue;
+      const ox = o.x - r.x, oy = o.y - r.y;
+      if(ox*ox + oy*oy < 4.4) mates++;
+    }
+
+    // he has hold of you — he goes where you go
+    const grab = Math.min(1, dt * 14);
+    d.x += (r.x - d.x) * grab;
+    d.y += (r.y - d.y) * grab;
+    d.vx = 0; d.vy = 0;
+
+    r.wrap.t += dt;
+    r.wrap.mates = mates;
+    r.wrap.grip += dt * GRIP_RATE * r.wrap.power * (1 + mates * 1.55);
+
+    const escRate = ESCAPE_RATE * Math.pow(0.5, r.breaks) *
+                    (1 - r.wrap.power * 0.6) / (1 + mates * 2.4);
+
+    if(r.wrap.grip >= 1){
+      // Brought down. You fall forward with whatever you had left.
+      r.x += Math.cos(r.ang) * 0.35 * r.spdF;
+      S.flashes.push({x:r.x, y:r.y, t:0.5, kind:'tackle'});
+      S.shake = 1;
+      r.wrap = null;
+      endRun(S, false);
+      return;
+    }
+    if(rng() < escRate * dt){
+      r.breaks++;
+      r.stumble = 0.55;              // off balance, easier to finish next time
+      r.spdF = 0.42;
+      r.hitFlash = 0.35;
+      d.down = true;
+      d.upAt = S.t + 2.6;
+      r.wrap = null;
+      S.flashes.push({x:r.x, y:r.y, t:0.45, kind:'break'});
+      S.shake = 0.6;
+      pushEvent(S, 'break', r, Math.round(r.x - START_X));
+    }
+  } else {
+    const R2 = TACKLE_R * TACKLE_R;
+    for(let i=0;i<S.defenders.length;i++){
+      const d = S.defenders[i];
+      if(d.down) continue;
+      const dx = d.x - r.x, dy = d.y - r.y;
+      const d2 = dx*dx + dy*dy;
+      if(d2 > R2) continue;
+
+      const dist = Math.sqrt(d2) || 0.0001;
+      const nx = dx / dist, ny = dy / dist;          // runner -> defender
+      const hx = Math.cos(r.ang), hy = Math.sin(r.ang);
+
+      /* Whether he is in front of you tells us almost nothing — he is
+         slower than you and intercepts predictively, so he is in front
+         essentially every time. What actually varies is HOW he gets there. */
+
+      // How far off your line is he? Dead in your path is a form tackle.
+      // Out at the edge of his reach is an arm across the chest.
+      const lateral = Math.abs(hx*dy - hy*dx);
+      const centred = 1 - Math.min(1, lateral / TACKLE_R);
+
+      // Is he driving through you, or drifting across you? A defender
+      // still shuffling his zone has nothing behind the hit.
+      const dspd = Math.sqrt(d.vx*d.vx + d.vy*d.vy) || 0.0001;
+      const square = Math.max(0, (d.vx * -nx + d.vy * -ny) / dspd);
+
+      // and how hard the two of you are genuinely coming together
+      const rvx = d.vx - hx * RUN_SPD * r.spdF;
+      const rvy = d.vy - hy * RUN_SPD * r.spdF;
+      const closing = Math.max(0, -(rvx*nx + rvy*ny));
+
+      const power = Math.max(0.24, Math.min(1,
+        0.24 + 0.34 * centred + 0.30 * square + 0.12 * Math.min(1, closing / 9)));
+
+      r.wrap = { by:d, grip:0, t:0, power:power, mates:0 };
+      r.hitFlash = 0.3;
+      S.shake = 0.35 + power * 0.5;
+      break;
+    }
+  }
+
+  if(S.shake > 0) S.shake = Math.max(0, S.shake - dt * 3.2);
+
+  for(let i=S.flashes.length-1;i>=0;i--){
+    S.flashes[i].t -= dt;
+    if(S.flashes[i].t <= 0) S.flashes.splice(i,1);
+  }
+
+  if(S.t >= TIME_CAP) endRun(S, false);
+}
+
+function endRun(S, td){
+  const r = S.runner;
+  r.done = true;
+  r.td = td;
+  r.finalX = td ? GOAL_B : r.x;
+  r.finalT = S.t;
+
+  const yards = td ? 99 : Math.max(0, Math.round(r.x - START_X));
+  S.marks.push({
+    x:r.finalX, y:r.y, name:r.name, color:r.color, td:td,
+    yards:yards, raw:Math.max(0, r.finalX - START_X)
+  });
+
+  const newBest = r.finalX > S.bestX;
+  if(newBest){ S.bestX = r.finalX; S.bestName = r.name; }
+
+  S.lastResult = {
+    name:r.name, yards:yards, td:td, newBest:newBest,
+    color:r.color, atLine:yardLineName(r.finalX),
+    chasing: S.bestName === r.name ? null : Math.max(0, Math.round(S.bestX - r.finalX))
+  };
+
+  pushEvent(S, td ? 'td' : 'tackle', r, yards);
+  S.phase = 'result';
+  S.phaseT = 0;
+}
+
+function advance(S){
+  S.idx++;
+  if(S.idx >= S.order.length){
+    S.phase = 'over';
+    S.phaseT = 0;
+    return;
+  }
+  prepareRun(S);
+}
+
+function yardLineName(x){
+  const v = Math.round(Math.max(0, Math.min(100, x)));
+  if(v >= 100) return 'the goal line';
+  if(v === 50) return 'the 50';
+  return 'the ' + (v > 50 ? 100 - v : v);
+}
+
+/* Turns raw yardages into display strings that are never ambiguous.
+   Everyone reads as a whole number until two managers would print the
+   same figure — then just those two gain the decimals that actually
+   separated them. Shared by the results board and the turf markers so
+   the two can never disagree. Pass null for a touchdown. */
+function yardStrings(vals){
+  const out = vals.map(function(v){ return v == null ? null : String(Math.round(v)); });
+
+  const groups = {};
+  out.forEach(function(s, i){
+    if(s == null) return;
+    if(!groups[s]) groups[s] = [];
+    groups[s].push(i);
+  });
+
+  Object.keys(groups).forEach(function(key){
+    const idx = groups[key];
+    if(idx.length < 2) return;
+    for(let dec=1; dec<=3; dec++){
+      const cand = idx.map(function(i){ return vals[i].toFixed(dec); });
+      const uniq = {};
+      let n = 0;
+      cand.forEach(function(c){ if(!uniq[c]){ uniq[c] = 1; n++; } });
+      if(n === idx.length || dec === 3){
+        idx.forEach(function(i, k){ out[i] = cand[k]; });
+        break;
+      }
+    }
+  });
+
+  return out;
+}
+
+function pushEvent(S, kind, r, yards){
+  let html;
+  if(kind === 'tackle'){
+    html = '<b>' + esc(r.name) + '</b> is down at ' + yardLineName(r.x) + ' &middot; ' + yards + ' yards';
+  } else if(kind === 'break'){
+    html = '<span class="hl">Broken tackle</span> &middot; <b>' + esc(r.name) + '</b> stays up at ' + yardLineName(r.x);
+  } else if(kind === 'beat'){
+    html = '<span class="hl">New leader</span> &middot; <b>' + esc(r.name) + '</b> clears the line to beat';
+  } else {
+    html = '<span class="sc">Touchdown</span> &middot; <b>' + esc(r.name) + '</b> goes the distance';
+  }
+  S.events.push({kind:kind, html:html});
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+  });
+}
+
+function finalOrder(S){
+  const list = S.runners.slice();
+  list.sort(function(a,b){
+    if(a.td && b.td) return a.finalT - b.finalT;
+    if(a.td) return -1;
+    if(b.td) return 1;
+    if(Math.abs(b.finalX - a.finalX) > 1e-9) return b.finalX - a.finalX;
+    return a.finalT - b.finalT;
+  });
+  return list;
+}
+
+/* ==========================================================
+   Rendering
+   ========================================================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const frame = document.getElementById('frame');
+let CW = 900, CH = 500, DPR = 1;
+
+function resize(){
+  const rect = frame.getBoundingClientRect();
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  CW = Math.max(320, Math.round(rect.width));
+  CH = Math.max(240, Math.round(rect.height));
+  cv.width = Math.round(CW * DPR);
+  cv.height = Math.round(CH * DPR);
+}
+if(window.ResizeObserver){ new ResizeObserver(resize).observe(frame); }
+window.addEventListener('resize', resize);
+
+const cam = {x:50, y:FW/2, z:9, init:false};
+
+function overviewCam(S){
+  let far = START_X;
+  if(S){
+    for(let i=0;i<S.runners.length;i++){
+      const r = S.runners[i];
+      if(!r.done) continue;
+      const fx = r.td ? GOAL_B : r.finalX;
+      if(fx > far) far = fx;
+    }
+  }
+  const lo = -6, hi = Math.min(112, far + 14);
+  const spanX = Math.max(46, hi - lo);
+  return {x:(lo+hi)/2, y:FW/2, z:Math.min(CW/spanX, CH/(FW+4))};
+}
+
+/* The overhead camera is only used once a run is over, so it just holds
+   the whole covered field. Keeping it parked there means the cut out of
+   first person lands on a settled frame instead of a moving one. */
+function camTarget(S){
+  if(!S) return {x:50, y:FW/2, z:Math.min(CW/126, CH/(FW+5))};
+  return overviewCam(S);
+}
+
+function applyCam(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.translate(CW/2, CH/2);
+  ctx.scale(cam.z, cam.z);
+  ctx.translate(-cam.x, -cam.y);
+}
+
+function drawField(){
+  ctx.fillStyle = '#173F27';
+  ctx.fillRect(-EZ-4, -4, 120+8, FW+8);
+  for(let x=-EZ; x<110; x+=5){
+    ctx.fillStyle = ((x/5) % 2 === 0) ? '#1A4A2E' : '#205836';
+    ctx.fillRect(x, 0, 5, FW);
+  }
+
+  ctx.fillStyle = '#0F3320';
+  ctx.fillRect(-EZ, 0, EZ, FW);
+  ctx.fillStyle = '#123D26';
+  ctx.fillRect(GOAL_B, 0, EZ, FW);
+
+  ctx.save();
+  ctx.translate(GOAL_B + EZ/2, FW/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = 'rgba(255,210,63,0.22)';
+  ctx.font = '700 6.4px "Barlow Condensed", Arial';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('P I C K   1 . 0 1', 0, 0);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-EZ/2, FW/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = 'rgba(234,242,236,0.13)';
+  ctx.font = '700 6.4px "Barlow Condensed", Arial';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('G A U N T L E T', 0, 0);
+  ctx.restore();
+
+  ctx.lineWidth = 0.16;
+  for(let x=0; x<=100; x+=5){
+    ctx.strokeStyle = (x % 10 === 0) ? 'rgba(234,242,236,0.5)' : 'rgba(234,242,236,0.3)';
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, FW); ctx.stroke();
+  }
+  ctx.lineWidth = 0.3;
+  ctx.strokeStyle = 'rgba(234,242,236,0.85)';
+  ctx.beginPath();
+  ctx.moveTo(0,0); ctx.lineTo(0,FW);
+  ctx.moveTo(100,0); ctx.lineTo(100,FW);
+  ctx.stroke();
+
+  ctx.lineWidth = 0.11;
+  ctx.strokeStyle = 'rgba(234,242,236,0.34)';
+  ctx.beginPath();
+  for(let x=1; x<100; x++){
+    if(x % 5 === 0) continue;
+    ctx.moveTo(x, 23.0);   ctx.lineTo(x, 24.0);
+    ctx.moveTo(x, 29.3);   ctx.lineTo(x, 30.3);
+    ctx.moveTo(x, 1.2);    ctx.lineTo(x, 2.0);
+    ctx.moveTo(x, FW-2.0); ctx.lineTo(x, FW-1.2);
+  }
+  ctx.stroke();
+
+  ctx.font = '700 4.2px "Barlow Condensed", Arial';
+  ctx.fillStyle = 'rgba(234,242,236,0.42)';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for(let x=10; x<=90; x+=10){
+    const label = String(x > 50 ? 100 - x : x);
+    ctx.save(); ctx.translate(x, 7.5);    ctx.rotate(-Math.PI/2); ctx.fillText(label, 0, 0); ctx.restore();
+    ctx.save(); ctx.translate(x, FW-7.5); ctx.rotate(Math.PI/2);  ctx.fillText(label, 0, 0); ctx.restore();
+  }
+
+  const g = ctx.createRadialGradient(50, FW/2, 8, 50, FW/2, 78);
+  g.addColorStop(0, 'rgba(255,255,235,0.05)');
+  g.addColorStop(1, 'rgba(0,0,0,0.30)');
+  ctx.fillStyle = g;
+  ctx.fillRect(-EZ-4, -4, 120+8, FW+8);
+}
+
+function drawMarks(S){
+  for(let i=0;i<S.marks.length;i++){
+    const m = S.marks[i];
+    ctx.strokeStyle = 'rgba(234,242,236,0.6)';
+    ctx.lineWidth = 0.14;
+    ctx.beginPath();
+    ctx.moveTo(m.x, 0.4); ctx.lineTo(m.x, FW-0.4);
+    ctx.stroke();
+
+    ctx.fillStyle = m.color;
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    ctx.moveTo(m.x, m.y-0.75); ctx.lineTo(m.x+0.75, m.y);
+    ctx.lineTo(m.x, m.y+0.75); ctx.lineTo(m.x-0.75, m.y);
+    ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* The line to beat — the broadcast yellow line, earning its keep:
+   it is the actual target every later runner is chasing. */
+function drawBeatLine(S){
+  if(!S.bestName || S.bestX <= START_X) return;
+  const passed = S.phase === 'running' && S.runner.x > S.bestX;
+  ctx.strokeStyle = passed ? 'rgba(234,242,236,0.55)' : '#FFD23F';
+  ctx.lineWidth = 0.26;
+  ctx.beginPath();
+  ctx.moveTo(S.bestX, 0); ctx.lineTo(S.bestX, FW);
+  ctx.stroke();
+}
+
+function drawRun(S){
+  const px = 1/cam.z;
+
+  // every route run tonight, faintest first
+  for(let i=0;i<S.runners.length;i++){
+    const r = S.runners[i];
+    if(r.trail.length < 2) continue;
+    const active = (r === S.runner && !r.done);
+    ctx.strokeStyle = r.color;
+    ctx.globalAlpha = active ? 0.55 : 0.13;
+    ctx.lineWidth = active ? 0.18 : 0.13;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(r.trail[0][0], r.trail[0][1]);
+    for(let k=1;k<r.trail.length;k++) ctx.lineTo(r.trail[k][0], r.trail[k][1]);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  if(S.phase === 'running' || S.phase === 'intro'){
+    for(let i=0;i<S.defenders.length;i++){
+      const d = S.defenders[i];
+      if(d.down){
+        ctx.fillStyle = 'rgba(67,82,90,0.55)';
+        ctx.beginPath(); ctx.ellipse(d.x, d.y, 0.85, 0.42, 0, 0, Math.PI*2); ctx.fill();
+        continue;
+      }
+      ctx.save();
+      ctx.translate(d.x, d.y);
+      ctx.rotate(Math.atan2(d.vy, d.vx));
+      ctx.fillStyle = '#6E8089';
+      ctx.strokeStyle = '#0B100E';
+      ctx.lineWidth = 0.12;
+      ctx.beginPath();
+      ctx.moveTo(0.72, 0); ctx.lineTo(-0.48, 0.52);
+      ctx.lineTo(-0.26, 0); ctx.lineTo(-0.48, -0.52);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  for(let i=0;i<S.flashes.length;i++){
+    const f = S.flashes[i];
+    const life = f.kind === 'break' ? 0.45 : 0.5;
+    const p = 1 - f.t/life;
+    const col = f.kind === 'tackle' ? '234,242,236' : '255,210,63';
+    ctx.strokeStyle = 'rgba(' + col + ',' + (1-p) + ')';
+    ctx.lineWidth = 0.2;
+    ctx.beginPath(); ctx.arc(f.x, f.y, 0.6 + p*2.8, 0, Math.PI*2); ctx.stroke();
+  }
+
+  // the active runner
+  if(S.phase === 'running' || S.phase === 'intro'){
+    const r = S.runner;
+    if(r.hitFlash > 0){
+      ctx.strokeStyle = 'rgba(255,210,63,0.8)';
+      ctx.lineWidth = 0.16;
+      ctx.beginPath(); ctx.arc(r.x, r.y, 1.15, 0, Math.PI*2); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(r.x, r.y+0.28, 0.86, 0.52, 0, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = r.color;
+    ctx.strokeStyle = '#0B100E';
+    ctx.lineWidth = 0.14;
+    ctx.beginPath(); ctx.arc(r.x, r.y, 0.82, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+    ctx.save();
+    ctx.translate(r.x, r.y);
+    ctx.scale(px, px);
+    ctx.font = '700 10px "Barlow Condensed", Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#0B100E';
+    ctx.fillText(String(r.num), 0, 0.5);
+    ctx.restore();
+  }
+}
+
+/* Marker labels live in screen space so they stay legible at any zoom,
+   and get nudged apart when two managers go down on top of each other —
+   the board on the turf is the point, so it has to stay readable. */
+function drawMarkLabels(S){
+  const showBeat = S.bestName && S.bestX > START_X;
+  if(!S.marks.length && !showBeat) return;
+
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.font = '600 11px "Barlow Condensed", Arial';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+
+  const markStr = yardStrings(S.marks.map(function(m){ return m.td ? null : m.raw; }));
+
+  const items = [];
+  for(let i=0;i<S.marks.length;i++){
+    const m = S.marks[i];
+    items.push({
+      m:m,
+      label:(m.td ? 'TD' : markStr[i]),
+      sx:(m.x - cam.x)*cam.z + CW/2,
+      sy:(m.y - cam.y)*cam.z + CH/2
+    });
+  }
+  items.sort(function(a,b){ return a.sy - b.sy; });
+
+  const placed = [];
+  for(let i=0;i<items.length;i++){
+    const it = items[i];
+    const txt = it.m.name.toUpperCase() + '  ' + it.label;
+    const w = ctx.measureText(txt).width + 8;
+
+    const flip = (it.sx + 13 + w) > CW - 6;
+    const lx = flip ? it.sx - 13 - w : it.sx + 13;
+    let ly = it.sy;
+
+    let guard = 0;
+    while(guard < 14){
+      let hit = false;
+      for(let k=0;k<placed.length;k++){
+        const p = placed[k];
+        if(Math.abs(p.x - lx) < Math.max(p.w, w) && Math.abs(p.y - ly) < 15){ hit = true; break; }
+      }
+      if(!hit) break;
+      ly += 16;
+      guard++;
+    }
+    ly = Math.max(10, Math.min(CH - 10, ly));
+    placed.push({x:lx, y:ly, w:w});
+
+    if(Math.abs(ly - it.sy) > 3){
+      ctx.strokeStyle = 'rgba(234,242,236,0.28)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(it.sx + (flip ? -4 : 4), it.sy);
+      ctx.lineTo(lx + (flip ? w : 0), ly);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(8,12,10,0.78)';
+    ctx.fillRect(lx, ly - 8, w, 16);
+    ctx.fillStyle = it.m.td ? '#17E0A0' : '#EAF2EC';
+    ctx.fillText(txt, lx + 4, ly + 0.5);
+  }
+
+  // "LINE TO BEAT" tag riding the yellow line
+  if(showBeat){
+    const sx = (S.bestX - cam.x)*cam.z + CW/2;
+    if(sx > -40 && sx < CW + 40){
+      const txt = 'LINE TO BEAT';
+      const w = ctx.measureText(txt).width + 10;
+      const flip = (sx + 6 + w) > CW - 4;
+      const lx = flip ? sx - 6 - w : sx + 6;
+      ctx.fillStyle = '#FFD23F';
+      ctx.fillRect(lx, 6, w, 16);
+      ctx.fillStyle = '#1A1400';
+      ctx.fillText(txt, lx + 5, 14.5);
+    }
+  }
+
+  applyCam();
+}
+
+/* ==========================================================
+   Broadcast chase camera
+   ----------------------------------------------------------
+   Above and behind the ball, tilted down at the turf. The
+   crucial part is that the camera's HEADING IS FIXED downfield:
+   it never rotates with the runner. From behind the facemask a
+   cut swung the entire world sideways and you lost the field
+   exactly when you most needed to read it. Here the runner can
+   cut as hard as he likes and the field stays put.
+
+   The simulation is untouched — this is only how it is drawn.
+   ========================================================== */
+const CAM3 = {
+  height: 18,     // yards above the turf
+  behind: 24,     // yards back from the ball
+  pitch: 0.42,    // radians of downward tilt (~24 degrees)
+  fov: 1.35,      // radians across (~77 degrees) — wide enough for the width
+  near: 0.6,
+  lateral: 0.45   // how much of the runner's sideways drift the camera copies
+};
+
+const chase = { y: FW/2, init: false };
+
+function chaseCam(S){
+  const r = S.runner;
+
+  // Track x exactly (a fixed trail distance never jitters) but only
+  // partly follow the sideways drift, so both sidelines stay in shot.
+  const wantY = FW/2 + (r.y - FW/2) * CAM3.lateral;
+  if(!chase.init){ chase.y = wantY; chase.init = true; }
+  chase.y += (wantY - chase.y) * 0.16;
+
+  const focal = (CW/2) / Math.tan(CAM3.fov/2);
+  return {
+    x: r.x - CAM3.behind,
+    y: chase.y,
+    z: CAM3.height,
+    cos: 1, sin: 0,                       // heading pinned downfield
+    cp: Math.cos(CAM3.pitch),
+    sp: Math.sin(CAM3.pitch),
+    focal: focal,
+    hy: CH/2 - Math.tan(CAM3.pitch) * focal   // where the horizon lands
+  };
+}
+
+/* World yards -> camera space, with pitch. u is height in view. */
+function toCam(c, wx, wy, wz){
+  const dx = wx - c.x, dy = wy - c.y, dz = (wz || 0) - c.z;
+  const f0 =  dx*c.cos + dy*c.sin;
+  const r0 = -dx*c.sin + dy*c.cos;
+  return {
+    f: f0*c.cp - dz*c.sp,
+    r: r0,
+    u: f0*c.sp + dz*c.cp
+  };
+}
+
+function proj(c, p){
+  const s = c.focal / p.f;
+  return { sx: CW/2 + p.r * s, sy: CH/2 - p.u * s };
+}
+
+/* A flat quad on the turf, clipped against the near plane so anything
+   level with or behind the camera does not invert across the screen. */
+function band(c, x1, x2, y1, y2, style){
+  const pts = [[x1,y1],[x2,y1],[x2,y2],[x1,y2]].map(function(p){ return toCam(c, p[0], p[1], 0); });
+  const keep = [];
+  for(let i=0;i<pts.length;i++){
+    const a = pts[i], b = pts[(i+1) % pts.length];
+    const ain = a.f >= CAM3.near, bin = b.f >= CAM3.near;
+    if(ain) keep.push(a);
+    if(ain !== bin){
+      const t = (CAM3.near - a.f) / (b.f - a.f);
+      keep.push({
+        f: CAM3.near,
+        r: a.r + (b.r - a.r) * t,
+        u: a.u + (b.u - a.u) * t
+      });
+    }
+  }
+  if(keep.length < 3) return;
+  ctx.fillStyle = style;
+  ctx.beginPath();
+  for(let i=0;i<keep.length;i++){
+    const s = proj(c, keep[i]);
+    if(i === 0) ctx.moveTo(s.sx, s.sy); else ctx.lineTo(s.sx, s.sy);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawSky(c){
+  const g = ctx.createLinearGradient(0, 0, 0, c.hy);
+  g.addColorStop(0, '#06090A');
+  g.addColorStop(1, '#0F1815');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, CW, c.hy + 1);
+
+  const sh = Math.max(24, CH * 0.15);
+  ctx.fillStyle = '#0B110F';
+  ctx.fillRect(0, c.hy - sh, CW, sh);
+
+  // Crowd, parallaxed against the camera's sideways drift. It used to key
+  // off the camera's heading, but this camera has no heading — it is pinned
+  // downfield — so that read as undefined and poisoned the gradients below.
+  // Positions are arithmetic, not random, so the speckle never shimmers.
+  const shift = -(c.y - FW/2) * 7;
+  ctx.fillStyle = 'rgba(184,205,194,0.17)';
+  for(let i=0;i<260;i++){
+    const a = ((i * 9301 + 49297) % 233280) / 233280;
+    const b = ((i * 4271 + 12345) % 99991) / 99991;
+    let x = (a * CW * 2 + shift) % (CW * 2);
+    if(x < 0) x += CW * 2;
+    if(x > CW) continue;
+    ctx.fillRect(x, c.hy - sh + b * sh * 0.9, 1.7, 1.7);
+  }
+
+  for(let i=0;i<4;i++){
+    let lx = ((0.13 + i * 0.25) * CW * 2 + shift) % (CW * 2);
+    if(lx < 0) lx += CW * 2;
+    if(lx > CW + 60) continue;
+    const rg = ctx.createRadialGradient(lx, c.hy - sh - 4, 2, lx, c.hy - sh - 4, 70);
+    rg.addColorStop(0, 'rgba(255,252,225,0.42)');
+    rg.addColorStop(1, 'rgba(255,252,225,0)');
+    ctx.fillStyle = rg;
+    ctx.fillRect(lx - 70, c.hy - sh - 74, 140, 140);
+  }
+
+  ctx.fillStyle = '#1A241F';
+  ctx.fillRect(0, c.hy - 2, CW, 3);
+}
+
+function drawTurf(S, c){
+  const camX = c.x;
+  const from = Math.floor(camX) - 8;
+
+  band(c, from - 40, 120, -70, FW + 70, '#0D1711');          // out of bounds
+  for(let x = Math.floor(from / 5) * 5; x < 110; x += 5){     // mowed stripes
+    band(c, x, x + 5, 0, FW, ((x / 5) % 2 === 0) ? '#1A4A2E' : '#205836');
+  }
+  band(c, 100, 110, 0, FW, '#123D26');                        // end zone
+
+  for(let x = Math.max(0, Math.floor(from / 5) * 5); x <= 100; x += 5){
+    band(c, x - 0.08, x + 0.08, 0, FW,
+         (x % 10 === 0) ? 'rgba(234,242,236,0.74)' : 'rgba(234,242,236,0.46)');
+  }
+  band(c, -0.16, 0.16, 0, FW, 'rgba(234,242,236,0.9)');
+  band(c, 99.84, 100.16, 0, FW, 'rgba(234,242,236,0.96)');
+
+  band(c, from - 4, 112, -0.4, 0, 'rgba(234,242,236,0.55)');  // sidelines
+  band(c, from - 4, 112, FW, FW + 0.4, 'rgba(234,242,236,0.55)');
+
+  const hashTo = Math.min(100, camX + 32);
+  for(let x = Math.max(1, Math.ceil(camX - 4)); x < hashTo; x++){
+    if(x % 5 === 0) continue;
+    band(c, x - 0.06, x + 0.06, 23.0, 24.0, 'rgba(234,242,236,0.3)');
+    band(c, x - 0.06, x + 0.06, 29.3, 30.3, 'rgba(234,242,236,0.3)');
+  }
+
+  for(let i=0;i<S.marks.length;i++){                          // earlier runs
+    band(c, S.marks[i].x - 0.1, S.marks[i].x + 0.1, 0, FW, 'rgba(234,242,236,0.42)');
+  }
+
+  if(S.bestName && S.bestX > START_X){                        // the line to beat
+    const passed = S.phase === 'running' && S.runner.x > S.bestX;
+    band(c, S.bestX - 0.24, S.bestX + 0.24, 0, FW,
+         passed ? 'rgba(234,242,236,0.6)' : '#FFD23F');
+  }
+}
+
+/* Night air eats colour with distance. Washing a far figure toward the
+   sky tone is the cheapest realism there is — without it, a body forty
+   yards out reads as sharply as one in your facemask, and the whole
+   scene flattens. */
+const HAZE = [22, 33, 28];
+function haze(hex, t){
+  const v = parseInt(hex.slice(1), 16);
+  const r = (v >> 16) & 255, g = (v >> 8) & 255, b = v & 255;
+  return 'rgb(' + Math.round(r + (HAZE[0] - r) * t) + ',' +
+                  Math.round(g + (HAZE[1] - g) * t) + ',' +
+                  Math.round(b + (HAZE[2] - b) * t) + ')';
+}
+
+/* Two-segment limb with a joint, so knees and elbows actually bend.
+   Straight sticks from hip to foot are what made the old figures read
+   as puppets rather than people. */
+function limb(x, y, len, swing, bend, w1, w2, col){
+  const half = len * 0.5;
+  const kx = x + Math.sin(swing) * half;
+  const ky = y + Math.cos(swing) * half;
+  const b2 = swing - bend;
+  const fx = kx + Math.sin(b2) * half;
+  const fy = ky + Math.cos(b2) * half;
+  ctx.strokeStyle = col;
+  ctx.lineWidth = w1;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(kx, ky); ctx.stroke();
+  ctx.lineWidth = w2;
+  ctx.beginPath(); ctx.moveTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
+  return [fx, fy];
+}
+
+/* A defender, drawn as a person: helmet, pads, bent limbs, a lean into
+   the run. Proportions are fractions of on-screen height, so one routine
+   covers a body forty yards downfield and one about to take your head off. */
+function drawPerson(sx, sy, h, d, t, fog, kit){
+  if(h < 2.5) return;
+  kit = kit || {};
+  const JERSEY_C = haze(kit.jersey || '#37474F', fog);
+  const JERSEY_L = haze(kit.lit    || '#4A5D66', fog);
+  const PANTS    = haze(kit.pants  || '#C9D2D7', fog);
+  const SKIN     = haze('#8A6B55', fog);
+  const HELMET   = haze(kit.helmet || '#1C2830', fog);
+  const RIM      = haze('#7E8F99', fog);
+
+  ctx.save();
+  ctx.translate(sx, sy);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  const lw = Math.max(0.7, h * 0.062);
+
+  // soft contact shadow rather than a hard ellipse
+  const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, h * 0.22);
+  sg.addColorStop(0, 'rgba(0,0,0,0.42)');
+  sg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = sg;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, h * 0.22, h * 0.07, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  if(d.down){
+    ctx.strokeStyle = JERSEY_C;
+    ctx.lineWidth = lw * 2.2;
+    ctx.beginPath();
+    ctx.moveTo(-h * 0.24, -h * 0.06);
+    ctx.lineTo(h * 0.20, -h * 0.10);
+    ctx.stroke();
+    ctx.strokeStyle = PANTS;
+    ctx.lineWidth = lw * 1.4;
+    ctx.beginPath();
+    ctx.moveTo(-h * 0.24, -h * 0.06);
+    ctx.lineTo(-h * 0.42, -h * 0.03);
+    ctx.stroke();
+    ctx.fillStyle = HELMET;
+    ctx.beginPath();
+    ctx.arc(h * 0.28, -h * 0.12, h * 0.078, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+
+  const spd = Math.sqrt(d.vx * d.vx + d.vy * d.vy);
+  const cyc = t * (5 + spd * 1.15) + d.homeY;
+  const a = Math.sin(cyc), b = Math.sin(cyc + Math.PI);
+
+  const lean = Math.min(0.16, spd * 0.016);          // drive forward
+  const hipY = -h * 0.46;
+  const shY  = -h * 0.78 + Math.abs(a) * h * 0.012;  // slight vertical bounce
+  const shX  = lean * h * 0.5;
+  const headY = shY - h * 0.10;
+
+  // legs — back leg folds under, front leg reaches
+  limb(0, hipY, h * 0.46, a * 0.62, Math.max(0, -Math.cos(cyc)) * 1.05,
+       lw * 1.5, lw * 1.15, PANTS);
+  limb(0, hipY, h * 0.46, b * 0.62, Math.max(0, -Math.cos(cyc + Math.PI)) * 1.05,
+       lw * 1.5, lw * 1.15, PANTS);
+
+  // torso as a solid, wider at the pads than the waist
+  ctx.fillStyle = JERSEY_C;
+  ctx.beginPath();
+  ctx.moveTo(-h * 0.075, hipY);
+  ctx.lineTo(h * 0.075, hipY);
+  ctx.lineTo(shX + h * 0.145, shY);
+  ctx.lineTo(shX - h * 0.145, shY);
+  ctx.closePath();
+  ctx.fill();
+  // lit edge along the shoulder line
+  ctx.strokeStyle = JERSEY_L;
+  ctx.lineWidth = Math.max(0.6, lw * 0.5);
+  ctx.beginPath();
+  ctx.moveTo(shX - h * 0.145, shY);
+  ctx.lineTo(shX + h * 0.145, shY);
+  ctx.stroke();
+
+  // arms, elbows bent, swinging opposite the legs
+  limb(shX - h * 0.125, shY, h * 0.34, b * 0.55 + 0.3, 0.85, lw * 1.05, lw * 0.8, JERSEY_L);
+  limb(shX + h * 0.125, shY, h * 0.34, a * 0.55 + 0.3, 0.85, lw * 1.05, lw * 0.8, JERSEY_L);
+
+  // helmet with a rim of floodlight down one side
+  ctx.fillStyle = HELMET;
+  ctx.beginPath();
+  ctx.arc(shX, headY, h * 0.086, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = RIM;
+  ctx.lineWidth = Math.max(0.5, lw * 0.42);
+  ctx.beginPath();
+  ctx.arc(shX, headY, h * 0.086, -2.5, -0.8);
+  ctx.stroke();
+  if(h > 26){
+    ctx.strokeStyle = haze('#9DACB4', fog);          // facemask
+    ctx.lineWidth = Math.max(0.6, lw * 0.3);
+    ctx.beginPath();
+    ctx.arc(shX, headY, h * 0.086, -0.5, 0.95);
+    ctx.stroke();
+    ctx.fillStyle = SKIN;                            // a sliver of face
+    ctx.beginPath();
+    ctx.arc(shX + h * 0.02, headY + h * 0.012, h * 0.03, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  if(kit.ball && h > 10){                            // tucked under the arm
+    ctx.save();
+    ctx.translate(shX + h * 0.15, shY + h * 0.14);
+    ctx.rotate(-0.5);
+    ctx.fillStyle = haze('#6E3C20', fog);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, h * 0.075, h * 0.044, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+/* Darken a jersey colour for the helmet so the runner's kit reads as one
+   outfit rather than two unrelated blocks of colour. */
+function hexShade(hex, k){
+  const v = parseInt(hex.slice(1), 16);
+  const r = Math.round(((v >> 16) & 255) * k);
+  const g = Math.round(((v >> 8) & 255) * k);
+  const b = Math.round((v & 255) * k);
+  return '#' + [r,g,b].map(function(n){ return ('0' + Math.min(255,n).toString(16)).slice(-2); }).join('');
+}
+
+const DEF_KIT = { jersey:'#37474F', lit:'#4A5D66', pants:'#C9D2D7', helmet:'#1C2830' };
+
+function drawPeople(S, c){
+  const r = S.runner;
+  const list = [];
+
+  for(let i=0;i<S.defenders.length;i++){
+    const d = S.defenders[i];
+    const p = toCam(c, d.x, d.y, 0);
+    if(p.f < CAM3.near) continue;
+    if(Math.abs(p.r / p.f) > 2.2) continue;
+    list.push({ ent:d, p:p, kit:DEF_KIT });
+  }
+
+  // the ball carrier, in his own colours
+  if(r){
+    const spd = RUN_SPD * r.spdF * (r.wrap ? WRAP_DRAG : 1);
+    const actor = {
+      vx: Math.cos(r.ang) * spd,
+      vy: Math.sin(r.ang) * spd,
+      down: false,
+      homeY: 0
+    };
+    const p = toCam(c, r.x, r.y, 0);
+    if(p.f >= CAM3.near){
+      list.push({
+        ent: actor, p: p, ball: true,
+        kit: {
+          jersey: r.color,
+          lit:    hexShade(r.color, 1.18),
+          pants:  '#EDF1F3',
+          helmet: hexShade(r.color, 0.55),
+          ball:   true
+        }
+      });
+    }
+  }
+
+  list.sort(function(a, b){ return b.p.f - a.p.f; });   // far first
+  for(let i=0;i<list.length;i++){
+    const it = list[i];
+    const feet = proj(c, it.p);
+    const h = (2.0 / it.p.f) * c.focal;
+    const fog = Math.max(0, Math.min(0.75, (it.p.f - 14) / 70));
+    drawPerson(feet.sx, feet.sy, h, it.ent, S.t, fog, it.kit);
+  }
+}
+
+/* Your own arms and the ball, held in the bottom of frame. This is what
+   sells the view as first person rather than a floating camera. */
+function drawChase(S){
+  const c = chaseCam(S);
+  const sk = S.shake || 0;
+
+  ctx.save();
+  if(sk > 0){
+    // A hit should register in the camera, not only in the numbers. Kept
+    // gentler than it was in first person — the whole point of this view
+    // is that you can still read the field while it happens.
+    const j = sk * Math.min(CW, CH) * 0.018;
+    ctx.translate(Math.sin(S.t * 71) * j, Math.cos(S.t * 63) * j * 0.7);
+  }
+
+  drawSky(c);
+  drawTurf(S, c);
+
+  // Floodlight wash pooling on the turf. The stripes alone read as flat
+  // paint; a pool of light gives the ground somewhere to fall away to.
+  const lg = ctx.createRadialGradient(CW * 0.5, c.hy + CH * 0.34, CH * 0.05,
+                                      CW * 0.5, c.hy + CH * 0.34, CH * 1.1);
+  lg.addColorStop(0, 'rgba(226,240,214,0.11)');
+  lg.addColorStop(0.45, 'rgba(200,225,190,0.04)');
+  lg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = lg;
+  ctx.fillRect(0, Math.max(0, c.hy), CW, CH);
+
+  drawPeople(S, c);
+  ctx.restore();
+
+  const vg = ctx.createRadialGradient(CW/2, CH/2, Math.min(CW,CH)*0.42, CW/2, CH/2, Math.max(CW,CH)*0.78);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.42)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, CW, CH);
+}
+
+function render(S){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle = '#0B100E';
+  ctx.fillRect(0,0,CW,CH);
+
+  // Chase camera for the run; cut to the overhead chalk board once
+  // someone is down, because that is where the draft order lives.
+  if(S && (S.phase === 'intro' || S.phase === 'running')){
+    drawChase(S);
+    return;
+  }
+
+  applyCam();
+  drawField();
+  if(S){
+    drawMarks(S);
+    drawBeatLine(S);
+    drawRun(S);
+    drawMarkLabels(S);
+  }
+}
+
+/* ==========================================================
+   UI
+   ========================================================== */
+const el = {
+  seedChip: document.getElementById('seedChip'),
+  speedBtn: document.getElementById('speedBtn'),
+  soundBtn: document.getElementById('soundBtn'),
+  bug: document.getElementById('bug'),
+  runof: document.getElementById('runof'),
+  evt: document.getElementById('evt'),
+  readout: document.getElementById('readout'),
+  bigYds: document.getElementById('bigYds'),
+  beatChip: document.getElementById('beatChip'),
+  beat: document.getElementById('beat'),
+  beatKicker: document.getElementById('beatKicker'),
+  beatName: document.getElementById('beatName'),
+  beatSub: document.getElementById('beatSub'),
+  pregame: document.getElementById('pregame'),
+  results: document.getElementById('results'),
+  names: document.getElementById('names'),
+  seed: document.getElementById('seed'),
+  shareUrl: document.getElementById('shareUrl'),
+  copyLinkBtn: document.getElementById('copyLinkBtn'),
+  shareHint: document.getElementById('shareHint'),
+  hookUrl: document.getElementById('hookUrl'),
+  postBtn: document.getElementById('postBtn'),
+  hookHint: document.getElementById('hookHint'),
+  diff: document.getElementById('diff'),
+  diffHint: document.getElementById('diffHint'),
+  err: document.getElementById('err'),
+  kick: document.getElementById('kick'),
+  railTitle: document.getElementById('railTitle'),
+  railSub: document.getElementById('railSub'),
+  railBody: document.getElementById('railBody'),
+  railNote: document.getElementById('railNote'),
+  board: document.getElementById('board'),
+  copyout: document.getElementById('copyout'),
+  resSeed: document.getElementById('resSeed'),
+  copyBtn: document.getElementById('copyBtn'),
+  againBtn: document.getElementById('againBtn'),
+  replayBtn: document.getElementById('replayBtn'),
+  editBtn: document.getElementById('editBtn')
+};
+
+const DIFF_HINT = {
+  '0.7':'Thin coverage. Long runs — about one draft in five ends with somebody scoring.',
+  '1':'Balanced. The order usually settles between the 30 and the 55.',
+  '1.8':'Heavy traffic. Most of the league goes down inside the 45.'
+};
+
+let S = null;
+let difficulty = 1;
+let speed = 1;
+let soundOn = false;
+let lastNames = DEFAULT_NAMES.slice();
+let isRewatch = false;
+
+/* ==========================================================
+   Game history
+   ----------------------------------------------------------
+   A seed alone does NOT identify a game. The result comes from
+   seed + manager list + gauntlet setting, so typing an old seed
+   against a different roster produces a different night. That is
+   why finished games are recorded here: the seed becomes a key
+   that restores the exact conditions, and the run plays back
+   identically because the simulation is deterministic.
+   ========================================================== */
+/* A rewatch code carries the whole game with it — seed, roster and
+   gauntlet — so it works with no storage at all, on any device, and can
+   be handed to somebody else. Saved history below is only a convenience
+   for the machine you drafted on; this is the part that always works. */
+function encodeGame(seed, names, diff){
+  try{
+    const payload = JSON.stringify({ s:seed, n:names, d:diff });
+    return 'GG' + btoa(unescape(encodeURIComponent(payload))).replace(/=+$/, '');
+  }catch(e){ return ''; }
+}
+
+function decodeGame(code){
+  const t = String(code || '').trim();
+  if(t.length < 6 || t.slice(0, 2).toUpperCase() !== 'GG') return null;
+  try{
+    const o = JSON.parse(decodeURIComponent(escape(atob(t.slice(2)))));
+    if(!o || typeof o.s !== 'string' || !Array.isArray(o.n) || o.n.length < 2) return null;
+    const names = o.n.filter(function(n){ return typeof n === 'string' && n.trim(); })
+                     .map(function(n){ return n.trim(); });
+    if(names.length < 2) return null;
+    return { seed:o.s, names:names, diff: typeof o.d === 'number' ? o.d : 1 };
+  }catch(e){ return null; }
+}
+
+el.names.value = DEFAULT_NAMES.join('\n');
+el.seed.value = newSeed();
+el.seedChip.querySelector('b').textContent = el.seed.value;
+
+el.diff.addEventListener('click', function(e){
+  const b = e.target.closest('button');
+  if(!b) return;
+  difficulty = parseFloat(b.dataset.d);
+  el.diffHint.textContent = DIFF_HINT[b.dataset.d];
+  Array.prototype.forEach.call(el.diff.children, function(c){
+    c.setAttribute('aria-pressed', String(c === b));
+  });
+});
+
+el.speedBtn.addEventListener('click', function(){
+  speed = speed === 1 ? 2 : (speed === 2 ? 0.5 : 1);
+  el.speedBtn.textContent = 'Speed ' + speed + '×';
+  el.speedBtn.setAttribute('aria-pressed', String(speed !== 1));
+});
+
+el.soundBtn.addEventListener('click', function(){
+  soundOn = !soundOn;
+  el.soundBtn.textContent = soundOn ? 'Sound On' : 'Sound Off';
+  el.soundBtn.setAttribute('aria-pressed', String(soundOn));
+  Sound.setCrowd(soundOn);
+});
+
+/* ==========================================================
+   Audio — an original broadcast package, synthesised live.
+   Everything here is generated from oscillators and noise:
+   a stacked-saw brass section, timpani, a stadium crowd bed
+   that swells on the big moments, and a short fanfare written
+   for this page. Nothing is sampled or borrowed.
+   ========================================================== */
+const Sound = (function(){
+  let ac = null, master = null, music = null, fx = null;
+  let crowdGain = null, crowdOn = false;
+
+  // D major — bright and brassy, the register TV fanfares live in.
+  const N = {
+    A2:110.00, D3:146.83, Fs3:185.00, A3:220.00, B3:246.94,
+    D4:293.66, E4:329.63, Fs4:369.99, G4:392.00, A4:440.00,
+    B4:493.88, D5:587.33, Fs5:739.99, A5:880.00
+  };
+
+  function ready(){
+    if(ac) return true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return false;
+    ac = new AC();
+    master = ac.createGain(); master.gain.value = 0.85; master.connect(ac.destination);
+    music  = ac.createGain(); music.gain.value  = 0.55; music.connect(master);
+    fx     = ac.createGain(); fx.gain.value     = 0.9;  fx.connect(master);
+    buildCrowd();
+    return true;
+  }
+
+  function noiseBuf(sec){
+    const n = Math.floor(ac.sampleRate * sec);
+    const b = ac.createBuffer(1, n, ac.sampleRate);
+    const d = b.getChannelData(0);
+    for(let i=0;i<n;i++) d[i] = Math.random()*2 - 1;
+    return b;
+  }
+
+  /* A stadium is basically filtered noise with a slow swell on top. */
+  function buildCrowd(){
+    const src = ac.createBufferSource();
+    src.buffer = noiseBuf(4);
+    src.loop = true;
+    const bp = ac.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 700; bp.Q.value = 0.55;
+    const lp = ac.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 2200;
+    crowdGain = ac.createGain(); crowdGain.gain.value = 0;
+    src.connect(bp); bp.connect(lp); lp.connect(crowdGain); crowdGain.connect(master);
+    src.start();
+  }
+
+  function crowd(level, tau){
+    if(!ac || !crowdOn) return;
+    crowdGain.gain.cancelScheduledValues(ac.currentTime);
+    crowdGain.gain.setTargetAtTime(level, ac.currentTime, tau || 0.5);
+  }
+
+  /* Brass: three detuned saws through a filter envelope, plus a sub
+     an octave down for the weight a horn section actually has. */
+  function brass(freq, t0, dur, vel){
+    const f = ac.createBiquadFilter();
+    f.type = 'lowpass'; f.Q.value = 1.1;
+    f.frequency.setValueAtTime(380, t0);
+    f.frequency.linearRampToValueAtTime(3000, t0 + 0.055);
+    f.frequency.exponentialRampToValueAtTime(850, t0 + dur);
+
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vel, t0 + 0.028);
+    g.gain.setValueAtTime(vel, t0 + dur*0.55);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+
+    [-9, 0, 9].forEach(function(cents){
+      const o = ac.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = freq;
+      o.detune.value = cents;
+      o.connect(f);
+      o.start(t0); o.stop(t0 + dur + 0.03);
+    });
+    f.connect(g); g.connect(music);
+
+    const sub = ac.createOscillator();
+    sub.type = 'triangle';
+    sub.frequency.value = freq/2;
+    const sg = ac.createGain();
+    sg.gain.setValueAtTime(0.0001, t0);
+    sg.gain.exponentialRampToValueAtTime(vel*0.55, t0 + 0.03);
+    sg.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    sub.connect(sg); sg.connect(music);
+    sub.start(t0); sub.stop(t0 + dur + 0.03);
+  }
+
+  function timp(t0, vel, freq){
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime((freq || 110)*1.6, t0);
+    o.frequency.exponentialRampToValueAtTime(freq || 110, t0 + 0.09);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(vel, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
+    o.connect(g); g.connect(music);
+    o.start(t0); o.stop(t0 + 0.45);
+  }
+
+  function noiseHit(t0, vel, dur, freq, bus){
+    const s = ac.createBufferSource();
+    s.buffer = noiseBuf(0.5);
+    const f = ac.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = freq || 3000; f.Q.value = 0.8;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(vel, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    s.connect(f); f.connect(g); g.connect(bus || music);
+    s.start(t0); s.stop(t0 + dur + 0.02);
+  }
+
+  /* The theme. Original melody, written for this page:
+     a pickup on the fifth, a rise to the octave, a stepwise
+     fall and a landing on the tonic under a full stab. */
+  function theme(big){
+    if(!ready()) return;
+    const t = ac.currentTime + 0.06;
+    const b = 0.19;
+
+    const mel = [
+      [0,  N.A3, 1.4], [1,  N.A3, 0.9], [2,  N.D4, 2.0],
+      [4,  N.E4, 0.9], [5,  N.Fs4, 0.9], [6, N.A4, 2.6],
+      [9,  N.G4, 0.9], [10, N.Fs4, 0.9], [11, N.E4, 0.9],
+      [12, N.D4, 3.6]
+    ];
+    mel.forEach(function(m){ brass(m[1], t + m[0]*b, m[2]*b, 0.2); });
+
+    const stabs = [
+      [0,  [N.D4, N.Fs4, N.A4]],
+      [6,  [N.G4, N.B4,  N.D5]],
+      [9,  [N.A3, N.E4,  N.A4]],
+      [12, [N.D4, N.Fs4, N.A5]]
+    ];
+    stabs.forEach(function(c){
+      c[1].forEach(function(f){ brass(f, t + c[0]*b, b*2.2, 0.07); });
+    });
+
+    for(let i=0;i<8;i++) timp(t + i*2*b, 0.5, i%4===0 ? 73.42 : 110);
+    noiseHit(t, 0.3, 0.5, 5200);
+    noiseHit(t + 12*b, 0.4, 0.9, 4200);
+    if(big){
+      brass(N.Fs5, t + 12*b, b*3.6, 0.13);
+      noiseHit(t + 12*b, 0.25, 1.4, 2400);
+    }
+  }
+
+  function flourish(){                       // new leader
+    if(!ready()) return;
+    const t = ac.currentTime + 0.04, b = 0.12;
+    [N.D4, N.Fs4, N.A4].forEach(function(f,i){ brass(f, t+i*b, 0.34, 0.17); });
+    timp(t, 0.45, 98);
+    noiseHit(t + 2*b, 0.22, 0.5, 4800);
+    crowd(0.16, 0.12);
+    setTimeout(function(){ crowd(0.05, 0.9); }, 900);
+  }
+
+  function fanfare(){                        // touchdown
+    if(!ready()) return;
+    const t = ac.currentTime + 0.04, b = 0.15;
+    [[0,N.D4],[1,N.Fs4],[2,N.A4],[3,N.D5],[4.4,N.A4],[5,N.D5]].forEach(function(m){
+      brass(m[1], t + m[0]*b, m[0]===5 ? 1.5 : 0.4, 0.2);
+    });
+    [N.D4,N.Fs4,N.A4,N.D5].forEach(function(f){ brass(f, t + 5*b, 1.5, 0.09); });
+    timp(t, 0.6, 73.42); timp(t + 5*b, 0.6, 73.42);
+    noiseHit(t + 5*b, 0.4, 1.6, 3600);
+    crowd(0.26, 0.08);
+    setTimeout(function(){ crowd(0.06, 1.4); }, 2000);
+  }
+
+  function stinger(){                        // between runs
+    if(!ready()) return;
+    const t = ac.currentTime + 0.03;
+    [N.D4, N.A4].forEach(function(f){ brass(f, t, 0.3, 0.12); });
+    timp(t, 0.35, 98);
+  }
+
+  return {
+    enable: function(){ ready(); },
+    setCrowd: function(v){ crowdOn = v; if(!v && crowdGain && ac) crowdGain.gain.setTargetAtTime(0, ac.currentTime, 0.2); },
+    /* Hard stop for the ambient bed. crowd() refuses to act when the
+       crowd is switched off, so silencing has to touch the gain itself. */
+    silence: function(){
+      if(crowdGain && ac){
+        crowdGain.gain.cancelScheduledValues(ac.currentTime);
+        crowdGain.gain.setTargetAtTime(0, ac.currentTime, 0.5);
+      }
+    },
+    crowd: crowd,
+    theme: theme, flourish: flourish, fanfare: fanfare, stinger: stinger,
+    hit: function(kind){
+      if(!ready()) return;
+      const t = ac.currentTime + 0.02;
+      if(kind === 'tackle'){
+        const o = ac.createOscillator();
+        o.type='sine';
+        o.frequency.setValueAtTime(150, t);
+        o.frequency.exponentialRampToValueAtTime(48, t+0.16);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.5, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t+0.2);
+        o.connect(g); g.connect(fx); o.start(t); o.stop(t+0.22);
+        noiseHit(t, 0.3, 0.13, 1700, fx);
+      }
+      else if(kind === 'break'){
+        noiseHit(t, 0.22, 0.1, 2600, fx);
+        const o = ac.createOscillator();
+        o.type='triangle';
+        o.frequency.setValueAtTime(300, t);
+        o.frequency.exponentialRampToValueAtTime(760, t+0.13);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.16, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t+0.15);
+        o.connect(g); g.connect(fx); o.start(t); o.stop(t+0.17);
+      }
+      else if(kind === 'whistle'){
+        [0, 0.14].forEach(function(off){
+          const o = ac.createOscillator(), o2 = ac.createOscillator();
+          o.type='sine'; o2.type='sine';
+          o.frequency.value = 2350; o2.frequency.value = 2510;
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.0001, t+off);
+          g.gain.exponentialRampToValueAtTime(0.13, t+off+0.015);
+          g.gain.exponentialRampToValueAtTime(0.0001, t+off+(off?0.2:0.1));
+          o.connect(g); o2.connect(g); g.connect(fx);
+          o.start(t+off); o.stop(t+off+0.25);
+          o2.start(t+off); o2.stop(t+off+0.25);
+        });
+      }
+    }
+  };
+})();
+
+/* ==========================================================
+   The booth — two callers working the run.
+   Draws from its OWN random stream, seeded separately, so the
+   commentary is reproducible without ever consuming a number
+   from the simulation's stream. If the booth pulled from the
+   sim, adding a line of chatter would change who wins.
+   ========================================================== */
+const Booth = (function(){
+  const PBP = 'Vance', COL = 'Dockery';
+  let rng = Math.random;
+  let feed = null;
+
+  function pick(list){ return list[Math.floor(rng()*list.length)]; }
+
+  /* "Marcus's hauled down" is read aloud as "Marcuses". Names already
+     ending in a sibilant take the full word instead. */
+  function isVerb(name){
+    return /[sxz]$/i.test(name) ? name + ' is' : name + "'s";
+  }
+
+  function line(who, text){
+    if(!feed) feed = document.getElementById('boothFeed');
+    if(!feed) return;
+    const d = document.createElement('div');
+    d.className = 'bline';
+    // leftover emphasis markers are stripped; they were only ever for speech
+    d.innerHTML = '<b class="' + (who === PBP ? 'pbp' : 'col') + '">' + who + '</b>' +
+                  esc(String(text).replace(/\*/g, ''));
+    feed.appendChild(d);
+    while(feed.children.length > 24) feed.removeChild(feed.firstChild);
+    feed.scrollTop = feed.scrollHeight;
+  }
+
+  return {
+
+    reset: function(seed, names){
+      rng = mulberry32(hashSeed(seed + '|booth'));
+      feed = document.getElementById('boothFeed');
+      if(feed) feed.innerHTML = '';
+      line(PBP, "Welcome in. " + names.length + " managers, ninety-nine yards of trouble, and only one of them's picking first.");
+      line(COL, pick([
+        "Same gauntlet for all of them, same odds. After that it's out of their hands.",
+        "One carry each. That's the whole draft, right there.",
+        "Nobody gets a friendlier defense than anybody else tonight. It's just nerve and luck."
+      ]), {low:true});
+    },
+
+    intro: function(name, bestYds, bestName, runNo, total){
+      if(bestName){
+        line(PBP, pick([
+          name + " steps in needing " + bestYds + " to take it over.",
+          bestYds + "'s the number. Here comes " + name + ".",
+          name + " has got a target now — " + bestYds + " yards, set by " + bestName + "."
+        ]));
+      } else {
+        line(PBP, pick([
+          name + " is up first, and whatever they do sets the mark for the rest of the night.",
+          "We start with " + name + ". No target, no pressure — just go.",
+          "First carry of the night belongs to " + name + "."
+        ]));
+      }
+      if(runNo === total && bestName){
+        line(COL, "Last run of the night, and it's all riding on this one.", {low:true});
+      }
+    },
+
+    broke: function(name){
+      line(PBP, pick([
+        "Oh, shook clean out of that one!",
+        name + " won't go down!",
+        "Broken tackle — and they're still running!"
+      ]), {hot:true, low:true});
+    },
+
+    tookLead: function(name){
+      line(PBP, pick([
+        "And there it is! *" + name + "* takes it over!",
+        "They've got it! " + isVerb(name) + " to the front of the board!",
+        name + " clears the line, and just like that we've got a *new leader*!"
+      ]), {hot:true});
+    },
+
+    deep: function(){
+      line(COL, pick([
+        "They're into open grass now.",
+        "Look at this — coverage is thick out here and they're still going.",
+        "Oh, this one could be something."
+      ]), {low:true});
+    },
+
+    housecall: function(){
+      line(PBP, "They could take this *all the way*!", {hot:true, low:true});
+    },
+
+    result: function(r, bestName){
+      if(r.td){
+        line(PBP, "*Touchdown!* " + r.name + " goes the whole way!", {hot:true});
+        line(COL, "Ninety-nine yards. That's the first pick, and *nobody's catching that*.");
+        return;
+      }
+      if(r.newBest){
+        line(PBP, r.name + " goes down at " + r.atLine + " — " + r.yards +
+                  " yards, and that's your *new number to beat*.");
+      } else if(r.chasing <= 3){
+        line(PBP, "Down at " + r.atLine + "! " + r.yards + " yards — *" + r.chasing + " short*!", {hot:true});
+        line(COL, pick([
+          "Oh, that's cruel. They were right there.",
+          "You can't get much closer than that.",
+          "That one's going to sting for a while."
+        ]));
+      } else {
+        line(PBP, isVerb(r.name) + " hauled down at " + r.atLine + ". " + r.yards +
+                  " yards, " + r.chasing + " short of " + bestName + ".");
+      }
+    },
+
+    closing: function(winner, yards, td){
+      line(PBP, "And that'll do it. *There's your draft order.*");
+      line(COL, td
+        ? winner + " scored. Everybody else is picking behind a touchdown."
+        : winner + " takes it with " + yards + " and the first pick.");
+    }
+  };
+})();
+
+/* Keeps the old call sites working, now routed through the package. */
+function sfx(kind){
+  if(!soundOn) return;
+  Sound.enable();
+  if(kind === 'tackle'){ Sound.hit('tackle'); Sound.crowd(0.035, 0.7); }
+  else if(kind === 'break'){ Sound.hit('break'); Sound.crowd(0.13, 0.1); setTimeout(function(){ Sound.crowd(0.06, 0.8); }, 700); }
+  else if(kind === 'beat'){ Sound.flourish(); }
+  else if(kind === 'snap'){ Sound.crowd(0.06, 0.6); }
+  else if(kind === 'td'){ Sound.fanfare(); }
+  else if(kind === 'whistle'){ Sound.hit('whistle'); Sound.crowd(0.02, 1.2); }
+  else if(kind === 'theme'){ Sound.theme(true); }
+  else if(kind === 'stinger'){ Sound.stinger(); }
+}
+
+/* ---- start ---- */
+el.kick.addEventListener('click', function(){
+  const names = el.names.value.split('\n')
+    .map(function(s){ return s.trim(); })
+    .filter(function(s){ return s.length > 0; })
+    .slice(0, 16);
+
+  if(names.length < 2){
+    el.err.textContent = 'Enter at least two managers, one per line.';
+    return;
+  }
+  el.err.textContent = '';
+  lastNames = names;
+
+  let seed = el.seed.value.trim();
+  if(!seed){ seed = newSeed(); el.seed.value = seed; }
+  start(names, seed);
+});
+
+el.againBtn.addEventListener('click', function(){
+  const seed = newSeed();
+  el.seed.value = seed;
+  start(lastNames, seed);
+});
+el.replayBtn.addEventListener('click', function(){
+  start(lastNames, el.seed.value.trim() || newSeed());
+});
+el.editBtn.addEventListener('click', function(){
+  Sound.silence();
+  el.results.hidden = true;
+  el.pregame.hidden = false;
+  el.bug.classList.remove('on');
+  el.readout.classList.remove('on');
+  el.beat.hidden = true;
+  S = null;
+  el.railBody.innerHTML = '';
+  el.railTitle.textContent = 'Standings';
+  el.railSub.textContent = '';
+  el.railNote.hidden = false;
+});
+
+/* ==========================================================
+   Sharing
+   ----------------------------------------------------------
+   A draft is fully described by seed + roster + gauntlet, so a
+   link carrying those three replays it exactly. No server and
+   no stored games: the address itself is the save file.
+   ========================================================== */
+let lastCode = '';
+
+/* Inside an iframe our own address is not the one anyone can open,
+   and outbound requests are usually blocked. Worth knowing, because
+   both facts change what we can honestly promise below. */
+const embedded = (function(){
+  try{ return window.top !== window.self; }catch(e){ return true; }
+})();
+
+function shareLink(code){
+  let base = '';
+  try{
+    const b = location.origin + location.pathname;
+    if(/^https?:/.test(b)) base = b;
+  }catch(e){}
+  return base ? base + '#g=' + code : '#g=' + code;
+}
+
+function applyDifficulty(d){
+  difficulty = d;
+  let matched = null;
+  Array.prototype.forEach.call(el.diff.children, function(c){
+    const on = Math.abs(parseFloat(c.dataset.d) - d) < 1e-9;
+    c.setAttribute('aria-pressed', String(on));
+    if(on) matched = c;
+  });
+  if(matched) el.diffHint.textContent = DIFF_HINT[matched.dataset.d];
+}
+
+function gameFromUrl(){
+  try{
+    const src = (location.hash || '') + '&' + (location.search || '');
+    const m = src.match(/[#&?]g=([^&#]+)/);
+    if(m) return decodeGame(decodeURIComponent(m[1]));
+  }catch(e){}
+  return null;
+}
+
+el.copyLinkBtn.addEventListener('click', function(){
+  el.shareUrl.select();
+  const flash = function(msg){
+    el.copyLinkBtn.textContent = msg;
+    setTimeout(function(){ el.copyLinkBtn.textContent = 'Copy link'; }, 1800);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(el.shareUrl.value)
+      .then(function(){ flash('Copied'); })
+      .catch(function(){ flash('Press Ctrl+C'); });
+  } else {
+    flash('Press Ctrl+C');
+  }
+});
+
+/* The webhook belongs to the user and never goes into a share link —
+   anyone holding it can post to that channel. It stays on this device. */
+try{
+  const savedHook = localStorage.getItem('gg.hook');
+  if(savedHook) el.hookUrl.value = savedHook;
+}catch(e){}
+
+el.postBtn.addEventListener('click', function(){
+  const url = el.hookUrl.value.trim();
+  if(!/^https:\/\/(canary\.|ptb\.)?discord(app)?\.com\/api\/webhooks\//.test(url)){
+    el.hookHint.textContent = 'That is not a Discord webhook URL. In Discord: Edit Channel, Integrations, Webhooks, New Webhook, Copy Webhook URL.';
+    return;
+  }
+  try{ localStorage.setItem('gg.hook', url); }catch(e){}
+
+  const fence = String.fromCharCode(96, 96, 96);
+  const board = el.copyout.textContent.trim();
+  const link = el.shareUrl.value;
+  const body = {
+    username: 'Gridiron Gauntlet',
+    content: '**The draft order is in.**\n' + fence + '\n' + board + '\n' + fence +
+             (/^https?:/.test(link) ? '\nWatch it back: ' + link : '')
+  };
+
+  el.postBtn.disabled = true;
+  el.hookHint.textContent = 'Posting…';
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(function(res){
+    el.postBtn.disabled = false;
+    if(res.ok || res.status === 204){
+      el.hookHint.textContent = 'Posted to Discord.';
+      el.postBtn.textContent = 'Posted';
+      setTimeout(function(){ el.postBtn.textContent = 'Post'; }, 2200);
+    } else {
+      el.hookHint.textContent = 'Discord refused that (' + res.status + '). Check the webhook still exists.';
+    }
+  }).catch(function(){
+    el.postBtn.disabled = false;
+    el.hookHint.textContent = embedded
+      ? 'Blocked — an embedded page cannot reach Discord. Host this file yourself and it works.'
+      : 'Could not reach Discord. Check the URL and your connection.';
+  });
+});
+
+el.copyBtn.addEventListener('click', function(){
+  const txt = el.copyout.textContent;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){
+      el.copyBtn.textContent = 'Copied';
+      setTimeout(function(){ el.copyBtn.textContent = 'Copy order'; }, 1600);
+    }).catch(function(){
+      el.copyBtn.textContent = 'Select the text below';
+      setTimeout(function(){ el.copyBtn.textContent = 'Copy order'; }, 2200);
+    });
+  } else {
+    el.copyBtn.textContent = 'Select the text below';
+    setTimeout(function(){ el.copyBtn.textContent = 'Copy order'; }, 2200);
+  }
+});
+
+let eventsSeen = 0;
+let revealed = false;
+let overWait = 0;
+let lastPhase = '';
+let railTick = 0;
+let milestone = 0;
+
+function start(names, seed, rewatch){
+  isRewatch = !!rewatch;
+  el.pregame.hidden = true;
+  el.results.hidden = true;
+  el.bug.classList.add('on');
+  el.railNote.hidden = true;
+  el.seedChip.querySelector('b').textContent = seed + (isRewatch ? ' · rewatch' : '');
+  el.railTitle.textContent = 'Standings';
+  el.evt.innerHTML = 'Runner set at the goal line.';
+  Booth.reset(seed, names);
+  Sound.silence();
+  if(soundOn){ Sound.enable(); Sound.setCrowd(true); sfx('theme'); }
+  S = buildSim(names, seed, difficulty);
+  cam.init = false;
+  milestone = 0;
+  eventsSeen = 0;
+  revealed = false;
+  overWait = 0;
+  lastPhase = '';
+  resize();
+  syncPhase();
+  lastPhase = S.phase;   // claim the phase, or the loop re-announces run 1
+}
+
+/* ---- per-phase chrome ---- */
+function syncPhase(){
+  if(!S) return;
+  const N = S.order.length;
+
+  if(S.phase === 'intro'){
+    const r = S.runner;
+    el.beat.hidden = false;
+    el.beat.querySelector('.beat-inner').style.animation = 'none';
+    void el.beat.offsetWidth;
+    el.beat.querySelector('.beat-inner').style.animation = '';
+    el.beatKicker.textContent = 'Run ' + (S.idx+1) + ' of ' + N;
+    el.beatName.textContent = r.name;
+    el.beatName.className = 'beat-name';
+    if(S.bestName){
+      el.beatSub.innerHTML = 'Line to beat &mdash; <b>' + Math.round(S.bestX - START_X) +
+        ' yds</b> by ' + esc(S.bestName);
+      el.beatSub.className = 'beat-sub';
+    } else {
+      el.beatSub.textContent = 'First run — sets the line to beat';
+      el.beatSub.className = 'beat-sub';
+    }
+    el.readout.classList.remove('on');
+    el.evt.innerHTML = '<b>' + esc(r.name) + '</b> takes the handoff.';
+    milestone = 0;
+    sfx('snap');
+    if(S.idx > 0) sfx('stinger');
+    Booth.intro(r.name, Math.round(S.bestX - START_X), S.bestName, S.idx + 1, S.order.length);
+  }
+  else if(S.phase === 'running'){
+    el.beat.hidden = true;
+    el.readout.classList.add('on');
+    Sound.crowd(0.07, 0.5);
+    if(S.bestName){
+      el.beatChip.hidden = false;
+      el.beatChip.innerHTML = 'To beat <b>' + Math.round(S.bestX - START_X) + '</b>';
+    } else {
+      el.beatChip.hidden = true;
+    }
+  }
+  else if(S.phase === 'result'){
+    const R = S.lastResult;
+    el.beat.hidden = false;
+    el.beat.querySelector('.beat-inner').style.animation = 'none';
+    void el.beat.offsetWidth;
+    el.beat.querySelector('.beat-inner').style.animation = '';
+    el.beatKicker.textContent = R.td ? 'Touchdown' : 'Down at ' + R.atLine;
+    el.beatName.textContent = R.td ? R.name + ' scores' : R.yards + ' yds';
+    el.beatName.className = 'beat-name' + (R.td ? ' scored' : '');
+    if(R.newBest){
+      el.beatSub.innerHTML = '<b>' + esc(R.name) + '</b> takes over the line to beat';
+      el.beatSub.className = 'beat-sub best';
+    } else {
+      el.beatSub.innerHTML = '<b>' + esc(R.name) + '</b> &mdash; ' + R.chasing + ' short of ' + esc(S.bestName);
+      el.beatSub.className = 'beat-sub';
+    }
+    el.readout.classList.remove('on');
+    sfx(R.td ? 'td' : 'whistle');
+    Booth.result(R, S.bestName);
+  }
+  else if(S.phase === 'over'){
+    el.beat.hidden = true;
+    el.readout.classList.remove('on');
+  }
+
+  el.runof.textContent = 'Run ' + Math.min(S.idx+1, N) + ' / ' + N;
+}
+
+function updateReadout(){
+  if(!S || S.phase !== 'running') return;
+  const r = S.runner;
+  const y = Math.max(0, Math.round(r.x - START_X));
+  el.bigYds.firstElementChild.textContent = y;
+  const ahead = S.bestName && r.x > S.bestX;
+  el.bigYds.className = 'big' + (ahead ? ' ahead' : '');
+
+  if(y >= 55 && milestone < 1){ milestone = 1; Booth.deep(); }
+  else if(y >= 82 && milestone < 2){ milestone = 2; Booth.housecall(); }
+}
+
+function updateRail(){
+  if(!S) return;
+
+  const done = S.runners.filter(function(r){ return r.done; });
+  done.sort(function(a,b){
+    if(a.td && !b.td) return -1;
+    if(b.td && !a.td) return 1;
+    return b.finalX - a.finalX;
+  });
+
+  const strs = yardStrings(done.map(function(r){
+    return r.td ? null : Math.max(0, r.finalX - START_X);
+  }));
+
+  let html = '';
+  for(let i=0;i<done.length;i++){
+    const r = done[i];
+    html += '<div class="row' + (i===0 ? ' lead' : '') + (r.td ? ' scored' : '') + '">' +
+      '<span class="pos">' + (i+1) + '</span>' +
+      '<span class="who"><span class="jer" style="background:' + r.color + '">' + r.num + '</span>' +
+      '<span class="nm">' + esc(r.name) + '</span></span>' +
+      '<span class="yds">' + (r.td ? 'TD' : strs[i] + '<i>YD</i>') + '</span>' +
+      '</div>';
+  }
+
+  const queue = [];
+  for(let k=S.idx; k<S.order.length; k++) queue.push(S.runners[S.order[k]]);
+
+  if(queue.length && S.phase !== 'over'){
+    html += '<div class="subhead">' + (queue.length === 1 ? 'Last up' : 'Up next') + '</div>';
+    for(let i=0;i<queue.length;i++){
+      const r = queue[i];
+      const onClock = (i === 0);
+      html += '<div class="row ' + (onClock ? 'onclock' : 'queued') + '">' +
+        '<span class="pos">' + (S.idx + i + 1) + '</span>' +
+        '<span class="who"><span class="jer" style="background:' + r.color + '">' + r.num + '</span>' +
+        '<span class="nm">' + esc(r.name) + '</span></span>' +
+        '<span class="yds">' + (onClock ? 'ON THE FIELD' : 'WAITING') + '</span>' +
+        '</div>';
+    }
+  }
+
+  el.railBody.innerHTML = html;
+  el.railSub.textContent = done.length + ' / ' + S.runners.length + ' run';
+}
+
+function drainEvents(){
+  while(eventsSeen < S.events.length){
+    const e = S.events[eventsSeen++];
+    el.evt.innerHTML = e.html;
+    if(e.kind === 'break'){ sfx('break'); Booth.broke(S.runner.name); }
+    else if(e.kind === 'beat'){ sfx('beat'); Booth.tookLead(S.runner.name); }
+    else if(e.kind === 'tackle') sfx('tackle');
+  }
+}
+
+/* ---- results ---- */
+function showResults(){
+  revealed = true;
+  sfx('whistle');
+  const order = finalOrder(S);
+
+  const ydsStr = yardStrings(order.map(function(r){
+    return r.td ? null : Math.max(0, r.finalX - START_X);
+  }));
+
+  let html = '', plain = 'DRAFT ORDER — seed ' + S.seed + '\n';
+  for(let i=0;i<order.length;i++){
+    const r = order[i];
+    const ydsTxt = r.td ? 'TOUCHDOWN' : (ydsStr[i] + ' yds');
+    const pick = '1.' + String(i+1).padStart(2,'0');
+    html += '<div class="brow' + (i===0 ? ' first' : '') + (r.td ? ' scored' : '') + '">' +
+      '<span class="pick">' + pick + '</span>' +
+      '<span class="jer" style="background:' + r.color + '">' + r.num + '</span>' +
+      '<span class="nm">' + esc(r.name) + '</span>' +
+      '<span class="res-y">' + ydsTxt + '</span>' +
+      '</div>';
+    plain += pick + '  ' + r.name + '  —  ' + ydsTxt + '\n';
+  }
+  el.board.innerHTML = html;
+  el.copyout.textContent = plain;
+  el.resSeed.textContent = S.seed;
+  lastCode = encodeGame(S.seed, S.runners.map(function(r){ return r.name; }), S.diff);
+  el.shareUrl.value = shareLink(lastCode);
+  el.shareHint.textContent = embedded
+    ? 'This page is embedded in another site, so the address above may not be one others can open. Host the file yourself and the link works anywhere.'
+    : 'Anyone who opens this watches the same draft, play for play.';
+  el.results.hidden = false;
+  el.bug.classList.remove('on');
+  el.railTitle.textContent = 'Final';
+
+  const w = order[0];
+  Booth.closing(w.name, Math.max(0, Math.round(w.finalX - START_X)), w.td);
+  Sound.crowd(0.12, 0.4);
+  // The draft is over — empty the stadium. Leaving the crowd bed running
+  // at a low level meant the page hummed quietly forever after the last run.
+  setTimeout(function(){ Sound.theme(true); }, 700);
+  setTimeout(function(){ Sound.silence(); }, 4200);
+
+  const rows = el.board.querySelectorAll('.brow');
+  const gap = rows.length > 12 ? 130 : 200;
+  for(let i=rows.length-1;i>=0;i--){
+    (function(row, delay){ setTimeout(function(){ row.classList.add('show'); }, delay); })(rows[i], (rows.length-1-i)*gap);
+  }
+  el.results.addEventListener('click', function once(){
+    for(let i=0;i<rows.length;i++) rows[i].classList.add('show');
+    el.results.removeEventListener('click', once);
+  });
+}
+
+/* ---- loop ---- */
+let acc = 0, last = performance.now();
+function loop(now){
+  const raw = Math.min(0.05, (now - last)/1000);
+  last = now;
+
+  if(S && S.phase !== 'over'){
+    acc += raw * speed;
+    let guard = 0;
+    while(acc >= DT && guard < 600){
+      step(S, DT);
+      acc -= DT;
+      guard++;
+      if(S.phase !== lastPhase) break;
+    }
+    drainEvents();
+    if(S.phase !== lastPhase){
+      lastPhase = S.phase;
+      syncPhase();
+    }
+    updateReadout();
+  }
+
+  const tgt = camTarget(S);
+  if(!cam.init){ cam.x = tgt.x; cam.y = tgt.y; cam.z = tgt.z; cam.init = true; }
+  const k = Math.min(1, raw * 2.6);
+  cam.x += (tgt.x - cam.x) * k;
+  cam.y += (tgt.y - cam.y) * k;
+  cam.z += (tgt.z - cam.z) * k;
+
+  /* A single bad number inside a draw call used to throw, break the
+     requestAnimationFrame chain, and freeze the page for good — mid-draft,
+     with no way back. A dropped frame is a far better failure than a dead
+     screen, so a draw error is reported once and the loop carries on. */
+  try{
+    render(S);
+  }catch(err){
+    if(!loop.warned){
+      loop.warned = true;
+      if(window.console && console.error) console.error('render error', err);
+    }
+  }
+
+  if(S){
+    railTick += raw;
+    if(railTick > 0.12){ railTick = 0; updateRail(); }
+    if(S.phase === 'over' && !revealed){
+      overWait += raw;
+      if(Math.abs(cam.z - tgt.z) < 0.35 || overWait > 2.5) showResults();
+    }
+  }
+
+  requestAnimationFrame(loop);
+}
+
+/* A shared link drops you straight into that draft. */
+(function(){
+  const g = gameFromUrl();
+  if(!g) return;
+  el.names.value = g.names.join(String.fromCharCode(10));
+  el.seed.value = g.seed;
+  lastNames = g.names.slice();
+  applyDifficulty(g.diff);
+  setTimeout(function(){ start(g.names, g.seed, true); }, 60);
+})();
+
+resize();
+requestAnimationFrame(loop);
+
+/* Headless run — same code path, no rendering. Lets anyone verify that
+   a seed reproduces the exact order it produced on draft night. */
+window.__gauntlet = {
+
+  run: function(names, seed, diff){
+    const sim = buildSim(names, seed, diff || 1);
+    let guard = 0;
+    while(sim.phase !== 'over' && guard < 400000){ step(sim, DT); guard++; }
+    return finalOrder(sim).map(function(r, i){
+      return {pick:i+1, name:r.name, yards: r.td ? 99 : Math.round(r.finalX - START_X), td:r.td};
+    });
+  }
+};
+
+})();
+</script>
